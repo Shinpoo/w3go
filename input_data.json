@@ -23,11 +23,18 @@
         "Itachi" : {
             "loc":[4,1],
             "car": 1
-        }     
+        },
+        "Naruto" : {
+            "loc":[0,4],
+            "car": 0
+        }       
     },
     "Destinations":{
         "Ichiraku": {
             "loc":[2,0]
+        },
+        "Mcdo": {
+            "loc":[1,4]
         },
         "Chez Dede": {
             "loc":[3,0]
