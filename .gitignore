@@ -1,3 +1,7 @@
 .vscode/settings.json
 .oenv/
 ~$case1.xlsx
+
+gurobi\.log
+
+results/

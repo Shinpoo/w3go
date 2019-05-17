@@ -3,6 +3,10 @@ from pyomo.environ import *
 import json
 from math import sqrt
 import matplotlib.pyplot as plt
+from datetime import datetime
+from shutil import copyfile
+import os
+
 
 model = ConcreteModel()
 
@@ -283,6 +287,11 @@ if results.solver.termination_condition != TerminationCondition.infeasible:
     pyomo_postprocess(None, model, results)
     print("Objective = %f" % value(model.objective))
 
+    #Plot
+    fig1 = plt.figure(figsize=(12, 6.75), dpi=120)
+    plt.axis('equal')
+    plt.grid()
+
     #Plot points
     for k,i in data["People"].items(): 
         plt.plot(i["loc"][0],i["loc"][1], 'o', label=k)
@@ -299,6 +308,10 @@ if results.solver.termination_condition != TerminationCondition.infeasible:
                 B_1 = {**data["People"], **data["Destinations"]}[j]["loc"][1]
                 plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, head_width=0.05, head_length=0.1, fc='k', ec='k')
     plt.legend()
-    plt.show()
-    
+    results_folder = "results/results__%s" % (datetime.now().strftime('%Y-%m-%d_%H%M%S'))
+    os.makedirs(results_folder)
+
+    fig1.savefig(results_folder + '/Itinerary.pdf')
+    copyfile("input_data.json", results_folder + "/inputs.json")
+
 print("Status = %s" % results.solver.termination_condition)

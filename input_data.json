@@ -40,10 +40,10 @@
             "loc":[3,0]
         },
         "Crusty" : {
-            "loc":[4,0]
+            "loc":[1,3]
         }    
     },
-    "People/car": 4,
+    "People/car": 2,
     "Activity": "Eat",
     "And More Parameters" :"More"
 }
