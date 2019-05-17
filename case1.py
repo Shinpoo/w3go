@@ -1,17 +1,56 @@
 from pyomo.opt import SolverFactory
 from pyomo.environ import *
-infinity = float('inf')
+import json
+from math import sqrt
+import matplotlib.pyplot as plt
 
 model = ConcreteModel()
-# => Pass to AbstractModel() if you want to parametrize the inputs.
-Npc = 1 # Nb personnes max/voiture
+
+########################
+### PRE-PROCESS DATA ###
+########################
+
+
+with open("input_data.json") as json_file:
+    data = json.loads(json_file.read())
+
+Npc = data["People/car"] 
+people_list = list(data["People"].keys())
+destination_list = list(data["Destinations"].keys())
+
+
+def distance(A, B):
+    # Calculate the distance from A to B
+    # This will be changed when using maps
+    return sqrt((A[0]-B[0])**2 + (A[1]-B[1])**2)
+
+dist_dict = {}
+# TODO Trouvez un moyen + simple avec dict comprehension
+for i,j in data["People"].items():
+    for k,l in data["People"].items():
+        dist_dict.update({(i,k): distance(j["loc"], l["loc"])}) 
+
+for i,j in data["People"].items():
+    for k,l in data["Destinations"].items():
+        dist_dict.update({(i,k): distance(j["loc"], l["loc"])}) 
+
+for i,j in data["Destinations"].items():
+    for k,l in data["People"].items():
+        dist_dict.update({(i,k): distance(j["loc"], l["loc"])}) 
+
+for i,j in data["Destinations"].items():
+    for k,l in data["Destinations"].items():
+        dist_dict.update({(i,k): distance(j["loc"], l["loc"])}) 
+
+car_dispo = {i:j["car"] for (i,j) in data["People"].items()}
+
 
 ############
 ### SETS ###
 ############
 
-model.D = Set(initialize=['D1'], doc='Destinations')
-model.P = Set(initialize=['P1','P2','P3'], doc='People')
+model.D = Set(initialize=destination_list, doc='Destinations')
+model.P = Set(initialize=people_list, doc='People')
 model.N = model.D | model.P # union
 
 
@@ -26,32 +65,32 @@ model.N = model.D | model.P # union
 #      P3                 2             1            0            1
 #      D1                 3             2            1            0
 
-dtab = {
-    ('P1','P1') : 0,
-    ('P1','P2') : 1,
-    ('P1','P3') : 2,
-    ('P1','D1') : 3,
-    ('P2','P1') : 1,
-    ('P2','P2') : 0,
-    ('P2','P3') : 1,
-    ('P2','D1') : 2,
-    ('P3','P1') : 2,
-    ('P3','P2') : 1,
-    ('P3','P3') : 0,
-    ('P3','D1') : 1,
-    ('D1','P1') : 3,
-    ('D1','P2') : 2,
-    ('D1','P3') : 1,
-    ('D1','D1') : 0
-    }
+# dtab = {
+#     ('P1','P1') : 0,
+#     ('P1','P2') : 1,
+#     ('P1','P3') : 2,
+#     ('P1','D1') : 3,
+#     ('P2','P1') : 1,
+#     ('P2','P2') : 0,
+#     ('P2','P3') : 1,
+#     ('P2','D1') : 2,
+#     ('P3','P1') : 2,
+#     ('P3','P2') : 1,
+#     ('P3','P3') : 0,
+#     ('P3','D1') : 1,
+#     ('D1','P1') : 3,
+#     ('D1','P2') : 2,
+#     ('D1','P3') : 1,
+#     ('D1','D1') : 0
+#     }
 
-car_dispo = {
-    'P1' : 1,
-    'P2' : 1,
-    'P3' : 0,
-    }
+# car_dispo = {
+#     'P1' : 1,
+#     'P2' : 1,
+#     'P3' : 0,
+#     }
 
-model.d = Param(model.N, model.N, initialize=dtab, doc='Distances')
+model.d = Param(model.N, model.N, initialize=dist_dict, doc='Distances')
 model.a_bar = Param(model.P, initialize=car_dispo, doc='Can use a car')
 # Mettre Np et Npc en param ?
 
@@ -243,5 +282,23 @@ def pyomo_postprocess(options=None, instance=None, results=None):
 if results.solver.termination_condition != TerminationCondition.infeasible:
     pyomo_postprocess(None, model, results)
     print("Objective = %f" % value(model.objective))
+
+    #Plot points
+    for k,i in data["People"].items(): 
+        plt.plot(i["loc"][0],i["loc"][1], 'o', label=k)
+    for k,i in data["Destinations"].items(): 
+        plt.plot(i["loc"][0],i["loc"][1], 'x', label=k)
+    
+    #Plot arrows
+    for i in model.N:
+        for j in model.N:
+            if value(model.b[i,j]) == 1 :
+                A_0 = {**data["People"], **data["Destinations"]}[i]["loc"][0] #Look in people and destinations
+                A_1 = {**data["People"], **data["Destinations"]}[i]["loc"][1]
+                B_0 = {**data["People"], **data["Destinations"]}[j]["loc"][0] 
+                B_1 = {**data["People"], **data["Destinations"]}[j]["loc"][1]
+                plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, head_width=0.05, head_length=0.1, fc='k', ec='k')
+    plt.legend()
+    plt.show()
     
 print("Status = %s" % results.solver.termination_condition)

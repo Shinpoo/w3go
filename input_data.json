@@ -1,0 +1,42 @@
+{
+    "People":{
+        "Livai": {
+            "loc":[0,1],
+            "car": 0
+        },
+        "Luffy": {
+            "loc":[1,1],
+            "car": 1
+        },
+        "Conrad" : {
+            "loc":[1,0],
+            "car": 1
+        },
+        "Saitama" : {
+            "loc":[3,1],
+            "car": 1
+        },
+        "Reiner Dakir" : {
+            "loc":[3,2],
+            "car": 0
+        },
+        "Itachi" : {
+            "loc":[4,1],
+            "car": 1
+        }     
+    },
+    "Destinations":{
+        "Ichiraku": {
+            "loc":[2,0]
+        },
+        "Chez Dede": {
+            "loc":[3,0]
+        },
+        "Crusty" : {
+            "loc":[4,0]
+        }    
+    },
+    "People/car": 4,
+    "Activity": "Eat",
+    "And More Parameters" :"More"
+}
