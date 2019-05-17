@@ -45,7 +45,14 @@ dtab = {
     ('D1','D1') : 0
     }
 
+car_dispo = {
+    'P1' : 1,
+    'P2' : 1,
+    'P3' : 0,
+    }
+
 model.d = Param(model.N, model.N, initialize=dtab, doc='Distances')
+model.a_bar = Param(model.P, initialize=car_dispo, doc='Can use a car')
 # Mettre Np et Npc en param ?
 
 #################
@@ -185,6 +192,7 @@ model.C8 = Constraint(model.P, model.P, rule=C8, doc='Acyclic')
 model.C8a = Constraint(model.P, rule=C8a, doc='C8a')
 model.C8b = Constraint(model.P, rule=C8b, doc='C8b')
 
+
 ## C9) Maximum Npc personnes par voiture
 ##     u_i <= N_pc (for all i in P)
 
@@ -193,12 +201,24 @@ def C9(model, i):
 
 model.C9 = Constraint(model.P, rule=C9, doc='Max person/car')
 
+
+## C10) Une personne ne peut prendre sa voiture uniquement si cette personne a mis sa voiture a disposition.
+##     a_i <= a_bar_i (for all i in P)
+
+def C10(model, i):
+    return model.a[i] <= model.a_bar[i]
+
+model.C10 = Constraint(model.P, rule=C10, doc='use car only if has a car')
+
+
 #########################
 ### SOLVING & RESULTS ###
 #########################
 
-solver = SolverFactory("cplex")
+
+solver=SolverFactory("gurobi")
 results = solver.solve(model)
+
 #results.write()
 print("\nDisplaying Solution\n" + '-'*60)
 # Print the value of the variables at the optimum
@@ -212,6 +232,7 @@ print("\nDisplaying Solution\n" + '-'*60)
 # # Print the value of the objective
 # print("Objective = %f" % value(model.objective))
 
+
 def pyomo_postprocess(options=None, instance=None, results=None):
     model.x.display()
     model.b.display()
@@ -219,6 +240,8 @@ def pyomo_postprocess(options=None, instance=None, results=None):
     model.u.display()
     #model.display()
 
-pyomo_postprocess(None, model, results)
-print("Objective = %f" % value(model.objective))
+if results.solver.termination_condition != TerminationCondition.infeasible:
+    pyomo_postprocess(None, model, results)
+    print("Objective = %f" % value(model.objective))
+    
 print("Status = %s" % results.solver.termination_condition)
