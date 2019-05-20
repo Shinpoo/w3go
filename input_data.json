@@ -47,9 +47,9 @@
             "loc":[1,3]
         }    
     },
-    "People/car": 1,
+    "People/car": 10,
     "Activity": "Eat",
     "And More Parameters" :"More",
-    "Solver": "gurobi",
+    "Solver": "cplex",
     "API_KEY": "None"
 }
