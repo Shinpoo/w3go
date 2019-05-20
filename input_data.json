@@ -2,7 +2,7 @@
     "People":{
         "Livai": {
             "loc":[0,1],
-            "car": 0
+            "car": 1
         },
         "Luffy": {
             "loc":[1,1],
@@ -18,16 +18,20 @@
         },
         "Reiner Dakir" : {
             "loc":[3,2],
-            "car": 0
+            "car": 1
         },
         "Itachi" : {
             "loc":[4,1],
             "car": 1
         },
         "Naruto" : {
-            "loc":[0,4],
-            "car": 0
-        }       
+            "loc":[2,10],
+            "car": 1
+        },
+        "Mikasa Jager" : {
+            "loc":[0,10],
+            "car": 1
+        }   
     },
     "Destinations":{
         "Ichiraku": {
@@ -43,7 +47,9 @@
             "loc":[1,3]
         }    
     },
-    "People/car": 2,
+    "People/car": 1,
     "Activity": "Eat",
-    "And More Parameters" :"More"
+    "And More Parameters" :"More",
+    "Solver": "gurobi",
+    "API_KEY": "None"
 }

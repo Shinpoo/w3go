@@ -7,6 +7,7 @@ from datetime import datetime
 from shutil import copyfile
 import os
 
+TOL_IS_ZERO = 1e-4
 
 model = ConcreteModel()
 
@@ -259,7 +260,7 @@ model.C10 = Constraint(model.P, rule=C10, doc='use car only if has a car')
 #########################
 
 
-solver=SolverFactory("gurobi")
+solver=SolverFactory(data["Solver"])
 results = solver.solve(model)
 
 #results.write()
@@ -299,9 +300,10 @@ if results.solver.termination_condition != TerminationCondition.infeasible:
         plt.plot(i["loc"][0],i["loc"][1], 'x', label=k)
     
     #Plot arrows
+
     for i in model.N:
         for j in model.N:
-            if value(model.b[i,j]) == 1 :
+            if 1 - TOL_IS_ZERO <= value(model.b[i,j]) <= 1 + TOL_IS_ZERO :
                 A_0 = {**data["People"], **data["Destinations"]}[i]["loc"][0] #Look in people and destinations
                 A_1 = {**data["People"], **data["Destinations"]}[i]["loc"][1]
                 B_0 = {**data["People"], **data["Destinations"]}[j]["loc"][0] 
