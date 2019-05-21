@@ -112,6 +112,10 @@ model.f = Var(within=Binary, doc="Acyclic variables")
 model.z1 = Var(model.P, model.D, within=Binary, doc="[Sum(i in P)] x_j*a_i (for linearization)")
 model.z2 = Var(model.P, model.D, within=Binary, doc="[Sum(i in P)] a_i*b_ij (for linearization)")
 model.v = Var(model.P, model.P, within=Binary, doc="Person i passed to j")
+model.delta1 = Var(model.P, model.P, within=Binary, doc="Aux variable")
+model.delta2 = Var(model.P, model.P, within=Binary, doc="Aux variable")
+model.z3 = Var(model.P, model.P, within=Binary, doc="Aux variable")
+model.PIC = Var(model.P, within=NonNegativeIntegers, doc="People in car")
 
 ##########################
 ### OBJECTIVE FUNCTION ###
@@ -269,13 +273,42 @@ def C10(model, i):
 model.C10 = Constraint(model.P, rule=C10, doc='use car only if has a car')
 
 def C11(model, i, j):
-    return model.u[j] - model.u[i] <= 40 + Big_M*(1 - model.v[i,j])
+    return -1 >= model.u[j] - model.u[i] - Big_M* (1 - model.delta1[i,j]) # TODO Verify
 
 def C12(model, i, j):
-    return Big_M*(1 - model.v[i,j]) + model.u[j] - model.u[i] >= 1
+    return -1 <= model.u[j] - model.u[i] + Big_M * model.delta1[i,j] # TODO Verify
+
+def C13(model, i, j):
+    return model.u[j] - model.u[i] >= 40 - Big_M * (1 - model.delta2[i,j])
+
+def C14(model, i, j):
+    return model.u[j] - model.u[i] <= 40 + Big_M * model.delta2[i,j]
+
+def C15(model, i, j):
+    return model.v[i,j] ==  1 - (model.delta1[i,j] + model.delta2[i,j])
+
+def C16(model, i, j):
+    return model.z3[i,j] <=  model.v[i,j]
+
+def C17(model, i, j):
+    return model.z3[i,j] <=  model.a[i]
+
+def C18(model, i, j):
+    return model.z3[i,j] >=  model.v[i,j] + model.a[i] - 1
+
+def C19(model, i):
+    return sum(model.z3[i,j] for j in model.P) ==  model.PIC[i]
 
 model.C11 = Constraint(model.P, model.P, rule=C11, doc='Car count')
 model.C12 = Constraint(model.P, model.P, rule=C12, doc='Car count')
+model.C13 = Constraint(model.P, model.P, rule=C13, doc='Car count')
+model.C14 = Constraint(model.P, model.P, rule=C14, doc='Car count')
+model.C15 = Constraint(model.P, model.P, rule=C15, doc='Car count')
+model.C16 = Constraint(model.P, model.P, rule=C16, doc='Car count')
+model.C17 = Constraint(model.P, model.P, rule=C17, doc='Car count')
+model.C18 = Constraint(model.P, model.P, rule=C18, doc='Car count')
+model.C19 = Constraint(model.P, rule=C19, doc='Car count')
+
 
 #########################
 ### SOLVING & RESULTS ###
@@ -304,6 +337,7 @@ def pyomo_postprocess(options=None, instance=None, results=None):
     model.a.display()
     model.u.display()
     model.v.display()
+    model.PIC.display()
     #model.objective.display()
     #model.display()
 
