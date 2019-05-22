@@ -261,9 +261,11 @@ model.C10 = Constraint(model.P, rule=C10, doc='use car only if has a car')
 
 
 solver=SolverFactory(data["Solver"])
-results = solver.solve(model)
+solver_manager = SolverManagerFactory('neos')
 
-#results.write()
+results = solver_manager.solve(model, opt=data["Solver"])
+
+results.write()
 print("\nDisplaying Solution\n" + '-'*60)
 # Print the value of the variables at the optimum
 # for i in model.P:

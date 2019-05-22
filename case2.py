@@ -20,7 +20,6 @@ model = ConcreteModel()
 with open("input_data.json") as json_file:
     data = json.loads(json_file.read())
 
-Npc = data["People/car"] 
 people_list = list(data["People"].keys())
 destination_list = list(data["Destinations"].keys())
 
@@ -49,7 +48,7 @@ for i,j in data["Destinations"].items():
         dist_dict.update({(i,k): distance(j["loc"], l["loc"])}) 
 
 car_dispo = {i:j["car"] for (i,j) in data["People"].items()}
-
+PIC_max = {i:j["PIC_max"] for (i,j) in data["People"].items()}
 
 ############
 ### SETS ###
@@ -98,6 +97,7 @@ for i in data["People"].keys():
 model.d = Param(model.N, model.N, initialize=dist_dict, doc='Distances')
 model.a_bar = Param(model.P, initialize=car_dispo, doc='Can use a car')
 model.u_bar = Param(model.P, initialize=u_level, doc='u level')
+model.PIC_bar = Param(model.P, initialize=PIC_max, doc='Max people in car')
 # Mettre Np et Npc en param ?
 
 #################
@@ -299,6 +299,9 @@ def C18(model, i, j):
 def C19(model, i):
     return sum(model.z3[i,j] for j in model.P) ==  model.PIC[i]
 
+def C20(model, i):
+    return model.PIC[i] <= model.PIC_bar[i]
+
 model.C11 = Constraint(model.P, model.P, rule=C11, doc='Car count')
 model.C12 = Constraint(model.P, model.P, rule=C12, doc='Car count')
 model.C13 = Constraint(model.P, model.P, rule=C13, doc='Car count')
@@ -308,16 +311,23 @@ model.C16 = Constraint(model.P, model.P, rule=C16, doc='Car count')
 model.C17 = Constraint(model.P, model.P, rule=C17, doc='Car count')
 model.C18 = Constraint(model.P, model.P, rule=C18, doc='Car count')
 model.C19 = Constraint(model.P, rule=C19, doc='Car count')
+model.C20 = Constraint(model.P, rule=C20, doc='Max PIC constraint')
 
 
 #########################
 ### SOLVING & RESULTS ###
 #########################
 
+# Use local solver
+
 solver=SolverFactory(data["Solver"])
 results = solver.solve(model)
 
-#results.write()
+# Use solver from Neos server
+# solver_manager = SolverManagerFactory('neos')
+# results = solver_manager.solve(model, opt=data["Solver"])
+
+results.write()
 print("\nDisplaying Solution\n" + '-'*60)
 # Print the value of the variables at the optimum
 # for i in model.P:
@@ -333,7 +343,7 @@ print("\nDisplaying Solution\n" + '-'*60)
 
 def pyomo_postprocess(options=None, instance=None, results=None):
     model.x.display()
-    model.b.display()
+    # model.b.display()
     model.a.display()
     model.u.display()
     model.v.display()

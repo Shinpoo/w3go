@@ -2,36 +2,45 @@
     "People":{
         "Livai": {
             "loc":[0,1],
-            "car": 1
+            "car": 1,
+            "PIC_max": 2
         },
         "Luffy": {
             "loc":[1,1],
-            "car": 1
+            "car": 1,
+            "PIC_max": 3
         },
         "Conrad" : {
             "loc":[1,0],
-            "car": 1
+            "car": 1,
+            "PIC_max": 3
         },
         "Saitama" : {
             "loc":[3,1],
-            "car": 1
+            "car": 1,
+            "PIC_max": 3
         },
         "Reiner Dakir" : {
             "loc":[3,2],
-            "car": 1
+            "car": 1,
+            "PIC_max": 3
         },
         "Itachi" : {
             "loc":[4,1],
-            "car": 1
+            "car": 1,
+            "PIC_max": 3
         },
         "Naruto" : {
             "loc":[2,10],
-            "car": 1
+            "car": 1,
+            "PIC_max": 3
         },
         "Mikasa Jager" : {
             "loc":[0,10],
-            "car": 1
-        }   
+            "car": 1,
+            "PIC_max": 4
+        }
+           
     },
     "Destinations":{
         "Ichiraku": {
