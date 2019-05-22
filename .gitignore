@@ -5,3 +5,4 @@
 gurobi\.log
 
 results/
+.vscode/
