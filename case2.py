@@ -320,12 +320,12 @@ model.C20 = Constraint(model.P, rule=C20, doc='Max PIC constraint')
 
 # Use local solver
 
-solver=SolverFactory(data["Solver"])
-results = solver.solve(model)
+# solver=SolverFactory(data["Solver"])
+# results = solver.solve(model)
 
 # Use solver from Neos server
-# solver_manager = SolverManagerFactory('neos')
-# results = solver_manager.solve(model, opt=data["Solver"])
+solver_manager = SolverManagerFactory('neos')
+results = solver_manager.solve(model, opt=data["Solver"])
 
 results.write()
 print("\nDisplaying Solution\n" + '-'*60)
