@@ -276,7 +276,7 @@ def C11(model, i, j):
     return -1 >= model.u[j] - model.u[i] - Big_M* (1 - model.delta1[i,j]) # TODO Verify
 
 def C12(model, i, j):
-    return -1 <= model.u[j] - model.u[i] + Big_M * model.delta1[i,j] # TODO Verify
+    return 0 <= model.u[j] - model.u[i] + Big_M * model.delta1[i,j] # TODO Verify
 
 def C13(model, i, j):
     return model.u[j] - model.u[i] >= 40 - Big_M * (1 - model.delta2[i,j])
@@ -375,7 +375,7 @@ if results.solver.termination_condition != TerminationCondition.infeasible:
                 A_1 = {**data["People"], **data["Destinations"]}[i]["loc"][1]
                 B_0 = {**data["People"], **data["Destinations"]}[j]["loc"][0] 
                 B_1 = {**data["People"], **data["Destinations"]}[j]["loc"][1]
-                plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, head_width=0.05, head_length=0.1, fc='k', ec='k')
+                plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, head_width=0.1, head_length=0.2, fc='k', ec='k')
     plt.legend()
     results_folder = "results/results__%s" % (datetime.now().strftime('%Y-%m-%d_%H%M%S'))
     os.makedirs(results_folder)

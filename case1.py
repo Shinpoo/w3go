@@ -197,7 +197,7 @@ model.C4e = Constraint(expr = len(model.P) * model.f >= len(model.P) - sum(model
 ## C5) Il doit y avoir au moins une voiture. Sinon la distance totale trouvée sera toujours 0 en n'activant aucune voiture. 
 ## N_cars >= 1 <=> sum(i in P) a_i >= 1
 
-model.C5 = Constraint(expr = sum(model.a[i] for i in model.P) >= 1, doc='One car')
+model.C5 = Constraint(expr = sum(model.a[i] for i in model.P) >= 1, doc='One car') # A virer (test)
 
 
 ## C6) La somme des chemins sortant d'un point P vaut toujours 1 (Que ce soit un point de départ ou non).
