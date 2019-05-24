@@ -1,3 +1,4 @@
+from pyomo.core.kernel import value
 from pyomo.environ import*
 from math import sqrt, ceil
 import matplotlib.pyplot as plt
@@ -6,6 +7,9 @@ from shutil import copyfile
 import os
 import time
 import json
+
+from pyomo.opt import TerminationCondition
+
 
 
 class Optimizer:
@@ -42,8 +46,8 @@ class Optimizer:
         self.d_max = data["d_max"] * len(data["people"])
         self.d_min = data["d_min"] * len(data["people"])
         self.car_available = {i:j["car"] for (i,j) in data["people"].items()}
-        self.PIC_max = {i:j["PIC_max"] for (i,j) in data["people"].items()}
-        self.global_PIC_max = data["global_PIC_max"] 
+        self.PPC_max = {i:j["PPC_max"] for (i,j) in data["people"].items()}
+        self.constant_PPC_max = data["constant_PPC_max"] 
         self.score = {i:j["score"] for (i,j) in data["destinations"].items()}
         self.u_level = {j:(i+1) * self.u_level_range for (i,j) in enumerate(data["people"].keys())}
 
@@ -70,10 +74,10 @@ class Optimizer:
         self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
         self.model.d_min = Param(initialize=self.d_min, doc='The distance that gives a 10/10 distance score')
         self.model.n_people = Param(initialize=len(self.model.P), doc='Number of people')
-        if self.case == "global_PIC":
-            self.model.PIC_max = Param(initialize=self.global_PIC_max, doc='Max people in car')
-        elif self.case == "local_PIC":
-            self.model.PIC_max = Param(self.model.P, initialize=self.PIC_max, doc='Max people in car')
+        if self.case == "constant_PPC":
+            self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
+        elif self.case == "variable_PPC":
+            self.model.PPC_max = Param(self.model.P, initialize=self.PPC_max, doc='Max people in car')
             self.model.u_max = Param(self.model.P, initialize=self.u_level, doc='u level')
 
     def _create_variables(self):
@@ -89,12 +93,12 @@ class Optimizer:
         self.model.d_score = Var(doc="distance score", within=NonNegativeReals)
         self.model.total_score = Var(doc="final score", within=NonNegativeReals)
 
-        if self.case == "local_PIC":
+        if self.case == "variable_PPC":
             self.model.v = Var(self.model.P, self.model.P, within=Binary, doc="1 if Person i passed to j")
             self.model.delta1 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
             self.model.delta2 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
             self.model.z3 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
-            self.model.PIC = Var(self.model.P, within=NonNegativeIntegers, doc="People in car")
+            self.model.PPC = Var(self.model.P, within=NonNegativeIntegers, doc="People in car")
 
     def _create_constraints(self):
         self._create_simplegraph_constraints()
@@ -143,7 +147,7 @@ class Optimizer:
 
 
     def _create_acyclicgraph_constraints(self):
-        if self.case == "global_PIC":
+        if self.case == "constant_PPC":
             def C8(model, i, j):
                 return model.n_people * (1 - model.b[i,j]) + model.u[j] >= model.u[i] + 1
             def C8a(model, i):
@@ -155,7 +159,7 @@ class Optimizer:
             self.model.C8a = Constraint(self.model.P, rule=C8a, doc='C8a')
             self.model.C8b = Constraint(self.model.P, rule=C8b, doc='C8b')
 
-        elif self.case == "local_PIC":
+        elif self.case == "variable_PPC":
             def C8(model, i, j):
                 return self.Big_M * (1 - model.b[i,j]) + model.u[j] >= model.u[i] + 1
             def C8prime(model, i, j):
@@ -177,13 +181,13 @@ class Optimizer:
 
         self.model.C10 = Constraint(self.model.P, rule=C10, doc='use car only if has a car')
 
-        if self.case == "global_PIC":
+        if self.case == "constant_PPC":
             def C9(model, i):
-                return model.u[i] <= model.PIC_max
+                return model.u[i] <= model.PPC_max
 
             self.model.C9 = Constraint(self.model.P, rule=C9, doc='Max person/car')
 
-        elif self.case == "local_PIC":
+        elif self.case == "variable_PPC":
             def C11(model, i, j):
                 return -1 >= model.u[j] - model.u[i] - self.Big_M* (1 - model.delta1[i,j])
             def C12(model, i, j):
@@ -201,9 +205,9 @@ class Optimizer:
             def C18(model, i, j):
                 return model.z3[i,j] >=  model.v[i,j] + model.a[i] - 1
             def C19(model, i):
-                return sum(model.z3[i,j] for j in model.P) ==  model.PIC[i]
+                return sum(model.z3[i,j] for j in model.P) ==  model.PPC[i]
             def C20(model, i):
-                return model.PIC[i] <= model.PIC_max[i]
+                return model.PPC[i] <= model.PPC_max[i]
 
             self.model.C11 = Constraint(self.model.P, self.model.P, rule=C11, doc='Car count')
             self.model.C12 = Constraint(self.model.P, self.model.P, rule=C12, doc='Car count')
@@ -214,7 +218,7 @@ class Optimizer:
             self.model.C17 = Constraint(self.model.P, self.model.P, rule=C17, doc='Car count')
             self.model.C18 = Constraint(self.model.P, self.model.P, rule=C18, doc='Car count')
             self.model.C19 = Constraint(self.model.P, rule=C19, doc='Car count')
-            self.model.C20 = Constraint(self.model.P, rule=C20, doc='Max PIC constraint')
+            self.model.C20 = Constraint(self.model.P, rule=C20, doc='Max PPC constraint')
 
     def _create_score_constraints(self):
         self.model.C21 = Constraint(expr = sum(self.model.x[i] * self.model.score[i] for i in self.model.D) == self.model.fun_score, doc='Fun level')
@@ -242,8 +246,8 @@ class Optimizer:
         if self.results.solver.termination_condition != TerminationCondition.infeasible:
             self.model.x.display()
             self.model.u.display()
-            if self.case == "local_PIC":
-                self.model.PIC.display()
+            if self.case == "variable_PPC":
+                self.model.PPC.display()
             print("Building duration = %gs"% self.building_duration)
             print("Solving duration = %gs"% self.solving_duration)
             print("Total distance = %f" % value(self.model.d_tot))

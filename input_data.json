@@ -3,42 +3,42 @@
         "Livai": {
             "loc":[0,1],
             "car": 1,
-            "PIC_max": 2
+            "PPC_max": 2
         },
         "Luffy": {
             "loc":[1,1],
             "car": 1,
-            "PIC_max": 3
+            "PPC_max": 3
         },
         "Conrad" : {
             "loc":[1,0],
             "car": 1,
-            "PIC_max": 3
+            "PPC_max": 3
         },
         "Saitama" : {
             "loc":[3,1],
             "car": 1,
-            "PIC_max": 3
+            "PPC_max": 3
         },
         "Reiner Dakir" : {
             "loc":[3,2],
             "car": 1,
-            "PIC_max": 3
+            "PPC_max": 3
         },
         "Itachi" : {
             "loc":[4,1],
             "car": 1,
-            "PIC_max": 3
+            "PPC_max": 3
         },
         "Naruto" : {
             "loc":[2,10],
             "car": 1,
-            "PIC_max": 3
+            "PPC_max": 3
         },
         "Mikasa Jager" : {
             "loc":[0,10],
             "car": 1,
-            "PIC_max": 4
+            "PPC_max": 4
         }
            
     },
@@ -60,12 +60,12 @@
             "score": 7.5
         }    
     },
-    "global_PIC_max": 4,
+    "constant_PPC_max": 4,
     "activity": "Eat",
     "alpha": 1,
     "d_max": 15,
     "d_min": 0,
-    "solver_manager": "neos",
-    "solver": "cplex",
+    "solver_manager": "local",
+    "solver": "gurobi",
     "API_KEY": "None"
 }
