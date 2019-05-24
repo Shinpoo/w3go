@@ -1,5 +1,5 @@
 {
-    "People":{
+    "people":{
         "Livai": {
             "loc":[0,1],
             "car": 1,
@@ -42,7 +42,7 @@
         }
            
     },
-    "Destinations":{
+    "destinations":{
         "Ichiraku": {
             "loc":[2,0],
             "score": 7.5
@@ -60,12 +60,12 @@
             "score": 7.5
         }    
     },
-    "People/car": 10,
-    "Activity": "Eat",
+    "global_PIC_max": 4,
+    "activity": "Eat",
     "alpha": 1,
     "d_max": 15,
     "d_min": 0,
-    "And More Parameters" :"More",
-    "Solver": "cplex",
+    "solver_manager": "neos",
+    "solver": "cplex",
     "API_KEY": "None"
 }

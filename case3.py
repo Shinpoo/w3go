@@ -214,7 +214,7 @@ model.C4e = Constraint(expr = len(model.P) * model.f >= len(model.P) - sum(model
 ## C5) Il doit y avoir au moins une voiture. Sinon la distance totale trouvée sera toujours 0 en n'activant aucune voiture. 
 ## N_cars >= 1 <=> sum(i in P) a_i >= 1
 
-model.C5 = Constraint(expr = sum(model.a[i] for i in model.P) >= 1, doc='One car')
+model.C5 = Constraint(expr = sum(model.a[i] for i in model.P) >= 1, doc='One car') # A virer surement car une fleche doit arriver a chauqe personne
 
 
 ## C6) La somme des chemins sortant d'un point P vaut toujours 1 (Que ce soit un point de départ ou non).
@@ -334,14 +334,14 @@ model.C23 = Constraint(expr = model.d_score == 10 * (model.d_tot - d_max) / (d_m
 ### SOLVING & RESULTS ###
 #########################
 
-# Use local solver
-
-# solver=SolverFactory(data["Solver"])
-# results = solver.solve(model)
-
-# Use solver from Neos server
-solver_manager = SolverManagerFactory('neos')
-results = solver_manager.solve(model, opt=data["Solver"])
+if data["solver_manager"] == "local":
+    # Use local solver
+    solver=SolverFactory(data["Solver"])
+    results = solver.solve(model)
+elif data["solver_manager"] == "neos":
+    # Use solver from Neos server
+    solver_manager = SolverManagerFactory('neos')
+    results = solver_manager.solve(model, opt=data["Solver"])
 
 results.write()
 print("\nDisplaying Solution\n" + '-'*60)

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from shutil import copyfile
 import os
+import time
+
 
 print("...")
 TOL_IS_ZERO = 1e-4
@@ -49,11 +51,15 @@ for i,j in data["Destinations"].items():
 
 car_dispo = {i:j["car"] for (i,j) in data["People"].items()}
 PIC_max = {i:j["PIC_max"] for (i,j) in data["People"].items()}
-
+u_level = {}
+level = 0
+for i in data["People"].keys():
+    level += 1000
+    u_level.update({i: level})   
 ############
 ### SETS ###
 ############
-
+t1_build = time.time()
 model.D = Set(initialize=destination_list, doc='Destinations')
 model.P = Set(initialize=people_list, doc='People')
 model.N = model.D | model.P # union
@@ -89,11 +95,7 @@ model.N = model.D | model.P # union
 #     ('D1','D1') : 0
 #     }
 
-u_level = {}
-level = 0
-for i in data["People"].keys():
-    level += 100
-    u_level.update({i: level})     
+  
 model.d = Param(model.N, model.N, initialize=dist_dict, doc='Distances')
 model.a_bar = Param(model.P, initialize=car_dispo, doc='Can use a car')
 model.u_bar = Param(model.P, initialize=u_level, doc='u level')
@@ -313,19 +315,24 @@ model.C18 = Constraint(model.P, model.P, rule=C18, doc='Car count')
 model.C19 = Constraint(model.P, rule=C19, doc='Car count')
 model.C20 = Constraint(model.P, rule=C20, doc='Max PIC constraint')
 
-
+t2_build = time.time()
 #########################
 ### SOLVING & RESULTS ###
 #########################
 
-# Use local solver
 
-# solver=SolverFactory(data["Solver"])
-# results = solver.solve(model)
-
-# Use solver from Neos server
-solver_manager = SolverManagerFactory('neos')
-results = solver_manager.solve(model, opt=data["Solver"])
+if data["solver_manager"] == "local":
+    # Use local solver
+    solver=SolverFactory(data["Solver"])
+    t1_solve = time.time()
+    results = solver.solve(model)
+    t2_solve = time.time()
+elif data["solver_manager"] == "neos":
+    # Use solver from Neos server
+    solver_manager = SolverManagerFactory('neos')
+    t1_solve = time.time()
+    results = solver_manager.solve(model, opt=data["Solver"])
+    t2_solve = time.time()
 
 results.write()
 print("\nDisplaying Solution\n" + '-'*60)
@@ -384,3 +391,5 @@ if results.solver.termination_condition != TerminationCondition.infeasible:
     copyfile("input_data.json", results_folder + "/inputs.json")
 
 print("Status = %s" % results.solver.termination_condition)
+print("Build time = %gs"%(t2_build - t1_build))
+print("Solve time = %gs"% (t2_solve - t1_solve))
