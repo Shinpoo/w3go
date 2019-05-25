@@ -6,3 +6,5 @@ gurobi\.log
 
 results/
 .vscode/
+
+__pycache__/

@@ -12,17 +12,16 @@ from pyomo.opt import TerminationCondition
 
 
 
-class Optimizer:
+class Optimizer(object):
     
-    def __init__(self, data_path, case):
+    def __init__(self, data_path):
         self.data_path = data_path
         self.data = self._load_data(self.data_path)
         self.u_level_range = 20
         self._pre_process_data(self.data)
         self.model = None
-        self.case = case
-        self.Big_M = 200
-        self.TOL_IS_ZERO = 1e-4
+        self.Big_M = 200 # TODO may be better to put different values for each Big_M such that big M is the minimum upper bound
+        self.TOL_IS_ZERO = 1e-4 # Move out tolerance from here 
         self._create_model()
         
 
@@ -74,11 +73,11 @@ class Optimizer:
         self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
         self.model.d_min = Param(initialize=self.d_min, doc='The distance that gives a 10/10 distance score')
         self.model.n_people = Param(initialize=len(self.model.P), doc='Number of people')
-        if self.case == "constant_PPC":
-            self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
-        elif self.case == "variable_PPC":
-            self.model.PPC_max = Param(self.model.P, initialize=self.PPC_max, doc='Max people in car')
-            self.model.u_max = Param(self.model.P, initialize=self.u_level, doc='u level')
+        # if self.case == "constant_PPC":
+        #     self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
+        # elif self.case == "variable_PPC":
+        #     self.model.PPC_max = Param(self.model.P, initialize=self.PPC_max, doc='Max people in car')
+        #     self.model.u_max = Param(self.model.P, initialize=self.u_level, doc='u level')
 
     def _create_variables(self):
         self.model.b = Var(self.model.N, self.model.N, within=Binary, doc='Arrow activation')
@@ -93,12 +92,12 @@ class Optimizer:
         self.model.d_score = Var(doc="distance score", within=NonNegativeReals)
         self.model.total_score = Var(doc="final score", within=NonNegativeReals)
 
-        if self.case == "variable_PPC":
-            self.model.v = Var(self.model.P, self.model.P, within=Binary, doc="1 if Person i passed to j")
-            self.model.delta1 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
-            self.model.delta2 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
-            self.model.z3 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
-            self.model.PPC = Var(self.model.P, within=NonNegativeIntegers, doc="People in car")
+        # if self.case == "variable_PPC":
+        #     self.model.v = Var(self.model.P, self.model.P, within=Binary, doc="1 if Person i passed to j")
+        #     self.model.delta1 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
+        #     self.model.delta2 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
+        #     self.model.z3 = Var(self.model.P, self.model.P, within=Binary, doc="Aux variable")
+        #     self.model.PPC = Var(self.model.P, within=NonNegativeIntegers, doc="People in car")
 
     def _create_constraints(self):
         self._create_simplegraph_constraints()
@@ -147,78 +146,78 @@ class Optimizer:
 
 
     def _create_acyclicgraph_constraints(self):
-        if self.case == "constant_PPC":
-            def C8(model, i, j):
-                return model.n_people * (1 - model.b[i,j]) + model.u[j] >= model.u[i] + 1
-            def C8a(model, i):
-                return model.u[i] >= 1
-            def C8b(model, i):
-                return model.u[i] <= model.n_people
+        pass
+        # if self.case == "constant_PPC":
+        #     def C8(model, i, j):
+        #         return model.n_people * (1 - model.b[i,j]) + model.u[j] >= model.u[i] + 1
+        #     def C8a(model, i):
+        #         return model.u[i] >= 1
+        #     def C8b(model, i):
+        #         return model.u[i] <= model.n_people
 
-            self.model.C8 = Constraint(self.model.P, self.model.P, rule=C8, doc='Acyclic')
-            self.model.C8a = Constraint(self.model.P, rule=C8a, doc='C8a')
-            self.model.C8b = Constraint(self.model.P, rule=C8b, doc='C8b')
+        #     self.model.C8 = Constraint(self.model.P, self.model.P, rule=C8, doc='Acyclic')
+        #     self.model.C8a = Constraint(self.model.P, rule=C8a, doc='C8a')
+        #     self.model.C8b = Constraint(self.model.P, rule=C8b, doc='C8b')
 
-        elif self.case == "variable_PPC":
-            def C8(model, i, j):
-                return self.Big_M * (1 - model.b[i,j]) + model.u[j] >= model.u[i] + 1
-            def C8prime(model, i, j):
-                return model.u[j] <= model.u[i] + 1 + self.Big_M * (1 - model.b[i,j])
-            def C8d(model, i):
-                return model.u[i] >= (1 + model.u_max[i]) * model.a[i]
-            def C8e(model, i):
-                return model.u[i] <= model.a[i] + self.Big_M*(1 - model.a[i]) + model.u_max[i]
+        # elif self.case == "variable_PPC":
+        #     def C8(model, i, j):
+        #         return self.Big_M * (1 - model.b[i,j]) + model.u[j] >= model.u[i] + 1
+        #     def C8prime(model, i, j):
+        #         return model.u[j] <= model.u[i] + 1 + self.Big_M * (1 - model.b[i,j])
+        #     def C8d(model, i):
+        #         return model.u[i] >= (1 + model.u_max[i]) * model.a[i]
+        #     def C8e(model, i):
+        #         return model.u[i] <= model.a[i] + self.Big_M*(1 - model.a[i]) + model.u_max[i]
 
-            self.model.C8 = Constraint(self.model.P, self.model.P, rule=C8, doc='Acyclic')
-            self.model.C8prime = Constraint(self.model.P, self.model.P, rule=C8prime, doc='Acyclic')
-            self.model.C8d = Constraint(self.model.P, rule=C8d, doc='C8d')
-            self.model.C8e = Constraint(self.model.P, rule=C8e, doc='C8e')
+        #     self.model.C8 = Constraint(self.model.P, self.model.P, rule=C8, doc='Acyclic')
+        #     self.model.C8prime = Constraint(self.model.P, self.model.P, rule=C8prime, doc='Acyclic')
+        #     self.model.C8d = Constraint(self.model.P, rule=C8d, doc='C8d')
+        #     self.model.C8e = Constraint(self.model.P, rule=C8e, doc='C8e')
 
     def _create_car_constraints(self):
-
         def C10(model, i):
             return model.a[i] <= model.a_max[i]
 
         self.model.C10 = Constraint(self.model.P, rule=C10, doc='use car only if has a car')
 
-        if self.case == "constant_PPC":
-            def C9(model, i):
-                return model.u[i] <= model.PPC_max
+        # if self.case == "constant_PPC":
+        #     def C9(model, i):
+        #         return model.u[i] <= model.PPC_max
 
-            self.model.C9 = Constraint(self.model.P, rule=C9, doc='Max person/car')
+        #     self.model.C9 = Constraint(self.model.P, rule=C9, doc='Max person/car')
 
-        elif self.case == "variable_PPC":
-            def C11(model, i, j):
-                return -1 >= model.u[j] - model.u[i] - self.Big_M* (1 - model.delta1[i,j])
-            def C12(model, i, j):
-                return 0 <= model.u[j] - model.u[i] + self.Big_M * model.delta1[i,j]
-            def C13(model, i, j):
-                return model.u[j] - model.u[i] >= ceil(self.u_level_range/2) - self.Big_M * (1 - model.delta2[i,j])
-            def C14(model, i, j):
-                return model.u[j] - model.u[i] <= ceil(self.u_level_range/2) - 1 + self.Big_M * model.delta2[i,j]
-            def C15(model, i, j):
-                return model.v[i,j] ==  1 - (model.delta1[i,j] + model.delta2[i,j])
-            def C16(model, i, j):
-                return model.z3[i,j] <=  model.v[i,j]
-            def C17(model, i, j):
-                return model.z3[i,j] <=  model.a[i]
-            def C18(model, i, j):
-                return model.z3[i,j] >=  model.v[i,j] + model.a[i] - 1
-            def C19(model, i):
-                return sum(model.z3[i,j] for j in model.P) ==  model.PPC[i]
-            def C20(model, i):
-                return model.PPC[i] <= model.PPC_max[i]
+        # elif self.case == "variable_PPC":
+        #     def C11(model, i, j):
+        #         return -1 >= model.u[j] - model.u[i] - self.Big_M* (1 - model.delta1[i,j])
+        #     def C12(model, i, j):
+        #         return 0 <= model.u[j] - model.u[i] + self.Big_M * model.delta1[i,j]
+        #     def C13(model, i, j):
+        #         return model.u[j] - model.u[i] >= ceil(self.u_level_range/2) - self.Big_M * (1 - model.delta2[i,j])
+        #     def C14(model, i, j):
+        #         return model.u[j] - model.u[i] <= ceil(self.u_level_range/2) - 1 + self.Big_M * model.delta2[i,j]
+        #     def C15(model, i, j):
+        #         return model.v[i,j] ==  1 - (model.delta1[i,j] + model.delta2[i,j])
+        #     def C16(model, i, j):
+        #         return model.z3[i,j] <=  model.v[i,j]
+        #     def C17(model, i, j):
+        #         return model.z3[i,j] <=  model.a[i]
+        #     def C18(model, i, j):
+        #         return model.z3[i,j] >=  model.v[i,j] + model.a[i] - 1
+        #     def C19(model, i):
+        #         return sum(model.z3[i,j] for j in model.P) ==  model.PPC[i]
+        #     def C20(model, i):
+        #         return model.PPC[i] <= model.PPC_max[i]
 
-            self.model.C11 = Constraint(self.model.P, self.model.P, rule=C11, doc='Car count')
-            self.model.C12 = Constraint(self.model.P, self.model.P, rule=C12, doc='Car count')
-            self.model.C13 = Constraint(self.model.P, self.model.P, rule=C13, doc='Car count')
-            self.model.C14 = Constraint(self.model.P, self.model.P, rule=C14, doc='Car count')
-            self.model.C15 = Constraint(self.model.P, self.model.P, rule=C15, doc='Car count')
-            self.model.C16 = Constraint(self.model.P, self.model.P, rule=C16, doc='Car count')
-            self.model.C17 = Constraint(self.model.P, self.model.P, rule=C17, doc='Car count')
-            self.model.C18 = Constraint(self.model.P, self.model.P, rule=C18, doc='Car count')
-            self.model.C19 = Constraint(self.model.P, rule=C19, doc='Car count')
-            self.model.C20 = Constraint(self.model.P, rule=C20, doc='Max PPC constraint')
+        #     self.model.C11 = Constraint(self.model.P, self.model.P, rule=C11, doc='Car count')
+        #     self.model.C12 = Constraint(self.model.P, self.model.P, rule=C12, doc='Car count')
+        #     self.model.C13 = Constraint(self.model.P, self.model.P, rule=C13, doc='Car count')
+        #     self.model.C14 = Constraint(self.model.P, self.model.P, rule=C14, doc='Car count')
+        #     self.model.C15 = Constraint(self.model.P, self.model.P, rule=C15, doc='Car count')
+        #     self.model.C16 = Constraint(self.model.P, self.model.P, rule=C16, doc='Car count')
+        #     self.model.C17 = Constraint(self.model.P, self.model.P, rule=C17, doc='Car count')
+        #     self.model.C18 = Constraint(self.model.P, self.model.P, rule=C18, doc='Car count')
+        #     self.model.C19 = Constraint(self.model.P, rule=C19, doc='Car count')
+        #     self.model.C20 = Constraint(self.model.P, rule=C20, doc='Max PPC constraint')
 
     def _create_score_constraints(self):
         self.model.C21 = Constraint(expr = sum(self.model.x[i] * self.model.score[i] for i in self.model.D) == self.model.fun_score, doc='Fun level')
@@ -246,8 +245,8 @@ class Optimizer:
         if self.results.solver.termination_condition != TerminationCondition.infeasible:
             self.model.x.display()
             self.model.u.display()
-            if self.case == "variable_PPC":
-                self.model.PPC.display()
+            # if self.case == "variable_PPC":
+            #     self.model.PPC.display()
             print("Building duration = %gs"% self.building_duration)
             print("Solving duration = %gs"% self.solving_duration)
             print("Total distance = %f" % value(self.model.d_tot))

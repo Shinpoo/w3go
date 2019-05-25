@@ -60,12 +60,12 @@
             "score": 7.5
         }    
     },
-    "constant_PPC_max": 4,
+    "constant_PPC_max": 10,
     "activity": "Eat",
-    "alpha": 1,
+    "alpha": 0.5,
     "d_max": 15,
     "d_min": 0,
-    "solver_manager": "local",
-    "solver": "gurobi",
+    "solver_manager": "neos",
+    "solver": "cbc",
     "API_KEY": "None"
 }
