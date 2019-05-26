@@ -3,9 +3,6 @@ from pyomo.environ import*
 
 
 class Case2optimizer(Optimizer):
-    
-    def __init__(self, data_path):
-        super().__init__(data_path)
 
     def _create_parameters(self):
         super()._create_parameters()
