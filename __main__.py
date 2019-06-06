@@ -3,6 +3,8 @@ from case2optimizer import Case2optimizer
 
 
 if __name__ == "__main__":
-    Ofun = Case1optimizer(data_path="input_data.json")
+    with open("input_data.json") as json_file:
+        data = json.loads(json_file.read())
+    Ofun = Case1optimizer(data_dict=data)
     Ofun.solve_model()
     Ofun.show_results()

@@ -65,7 +65,7 @@
     "alpha": 0.5,
     "d_max": 15,
     "d_min": 0,
-    "solver_manager": "neos",
-    "solver": "cbc",
+    "solver_manager": "local",
+    "solver": "gurobi",
     "API_KEY": "None"
 }

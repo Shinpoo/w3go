@@ -6,7 +6,6 @@ from datetime import datetime
 from shutil import copyfile
 import os
 import time
-import json
 
 from pyomo.opt import TerminationCondition
 
@@ -14,9 +13,8 @@ from pyomo.opt import TerminationCondition
 
 class Optimizer(object):
     
-    def __init__(self, data_path):
-        self.data_path = data_path
-        self.data = self._load_data(self.data_path)
+    def __init__(self, data_dict):
+        self.data = data_dict
         self.u_level_range = 20
         self._pre_process_data(self.data)
         self.model = None
@@ -25,9 +23,6 @@ class Optimizer(object):
         self._create_model()
         
 
-    def _load_data(self, path):
-        with open(path) as json_file:
-            return json.loads(json_file.read())
 
     def _pre_process_data(self, data):
 
