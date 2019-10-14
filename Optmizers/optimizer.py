@@ -255,7 +255,7 @@ class Optimizer(object):
     def _plot_results(self):
         fig1 = plt.figure(figsize=(12, 6.75), dpi=120)
         plt.axis('equal')
-        plt.grid()
+        #plt.grid()
 
         for k,i in self.data["people"].items(): 
             plt.plot(i["loc"][0],i["loc"][1], 'o', label=k)
@@ -275,4 +275,4 @@ class Optimizer(object):
         os.makedirs(results_folder)
 
         fig1.savefig(results_folder + '/Itinerary.pdf')
-        copyfile(self.data_path, results_folder + "/inputs.json")
+        #copyfile(self.data, results_folder + "/inputs.json")
