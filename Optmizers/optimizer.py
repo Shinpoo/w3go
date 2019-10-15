@@ -8,6 +8,9 @@ import os
 import time
 
 from pyomo.opt import TerminationCondition
+from datetimerange import DateTimeRange
+from dateutil.parser import isoparse
+from itertools import product
 
 
 
@@ -41,9 +44,25 @@ class Optimizer(object):
         self.d_min = data["d_min"] * len(data["people"])
         self.car_available = {i:j["car"] for (i,j) in data["people"].items()}
         self.PPC_max = {i:j["PPC_max"] for (i,j) in data["people"].items()}
+        self.people_avail = {i:j["availabilities"] for (i,j) in data["people"].items()}
+        self.dest_avail = {i:j["availabilities"] for (i,j) in data["people"].items()}
         self.constant_PPC_max = data["constant_PPC_max"] 
         self.score = {i:j["score"] for (i,j) in data["destinations"].items()}
         self.u_level = {j:(i+1) * self.u_level_range for (i,j) in enumerate(data["people"].keys())}
+        self._compute_interval_score()
+
+    def _compute_interval_score(self):
+        i = 0
+        for name,timeranges in {**self.people_avail, **self.dest_avail}.items():
+            new_element = [(DateTimeRange(timerange[0],timerange[1]).start_datetime, DateTimeRange(timerange[0],timerange[1]).end_datetime) for timerange in timeranges]
+            if i == 0:
+                union = new_element.copy()
+                i = 1
+            else:
+                union = [(min(s1, s2), max(e1, e2)) for (s1, e1), (s2, e2) in product(union, new_element) if s1 <= e2 and e1 >= s2]
+            print(union)
+
+        
 
     def _create_model(self):
         t0_building = time.time()

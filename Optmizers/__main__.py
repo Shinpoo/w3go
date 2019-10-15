@@ -5,6 +5,8 @@ import json
 if __name__ == "__main__":
     with open("input_data.json") as json_file:
         data = json.loads(json_file.read())
+        #time_range = DateTimeRange(data["people"]["Livai"]["availabilities"][0][0],data["people"]["Livai"]["availabilities"][0][1])
+        #print(time_range)
     Ofun = Case2optimizer(data_dict=data)
     Ofun.solve_model()
     Ofun.show_results()
