@@ -294,4 +294,4 @@ class Optimizer(object):
         os.makedirs(results_folder)
 
         fig1.savefig(results_folder + '/Itinerary.pdf')
-        #copyfile(self.data, results_folder + "/inputs.json")
+                copyfile("input_data.json", results_folder + "/inputs.json")
