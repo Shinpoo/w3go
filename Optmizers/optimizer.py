@@ -52,6 +52,7 @@ class Optimizer(object):
         self._compute_interval_score()
 
     def _compute_interval_score(self):
+        # TODO change it in the way: product of ith element of each person = 1 or 0
         i = 0
         for name,timeranges in {**self.people_avail, **self.dest_avail}.items():
             new_element = [(DateTimeRange(timerange[0],timerange[1]).start_datetime, DateTimeRange(timerange[0],timerange[1]).end_datetime) for timerange in timeranges]
