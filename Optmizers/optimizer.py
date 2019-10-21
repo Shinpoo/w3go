@@ -45,25 +45,31 @@ class Optimizer(object):
         self.car_available = {i:j["car"] for (i,j) in data["people"].items()}
         self.PPC_max = {i:j["PPC_max"] for (i,j) in data["people"].items()}
         self.people_avail = {i:j["availabilities"] for (i,j) in data["people"].items()}
-        self.dest_avail = {i:j["availabilities"] for (i,j) in data["people"].items()}
+        self.dest_avail = {i:j["availabilities"] for (i,j) in data["destinations"].items()}
         self.constant_PPC_max = data["constant_PPC_max"] 
         self.score = {i:j["score"] for (i,j) in data["destinations"].items()}
         self.u_level = {j:(i+1) * self.u_level_range for (i,j) in enumerate(data["people"].keys())}
         self._compute_interval_score()
 
     def _compute_interval_score(self):
-        # TODO change it in the way: product of ith element of each person = 1 or 0
-        i = 0
-        for name,timeranges in {**self.people_avail, **self.dest_avail}.items():
-            new_element = [(DateTimeRange(timerange[0],timerange[1]).start_datetime, DateTimeRange(timerange[0],timerange[1]).end_datetime) for timerange in timeranges]
-            if i == 0:
-                union = new_element.copy()
-                i = 1
-            else:
-                union = [(min(s1, s2), max(e1, e2)) for (s1, e1), (s2, e2) in product(union, new_element) if s1 <= e2 and e1 >= s2]
-            print(union)
+        # TODO passage en POO au lieu de dict
+        self.dest_inter = {}
+        self.dest_score_inter = {i:10 for i in self.destination_list}
+        for destination in self.destination_list:
+            self.dest_inter[destination] = []
+            for i in range(len(self.dest_avail[destination])):
+                product = self.dest_avail[destination][i]
+                for person in self.people_list:
+                    product *= self.people_avail[person][i]
+                self.dest_inter[destination].append(product)
+        print(self.dest_inter.items())
+        for (k,v) in self.dest_inter.items():
+            if not any(v):
+                self.dest_score_inter[k] -= 1
+                self.increase_people_avail()
 
-        
+    def increase_people_avail(self):
+        pass
 
     def _create_model(self):
         t0_building = time.time()
@@ -295,4 +301,4 @@ class Optimizer(object):
         os.makedirs(results_folder)
 
         fig1.savefig(results_folder + '/Itinerary.pdf')
-                copyfile("input_data.json", results_folder + "/inputs.json")
+        copyfile("input_data.json", results_folder + "/inputs.json")
