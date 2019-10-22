@@ -1,11 +1,14 @@
-from optimizer import Optimizer
+from optimizers.optimizer import Optimizer
 from pyomo.environ import*
 
 
 class Case1optimizer(Optimizer):
+    def __init__(self, params):
+        super().__init__(params)
+        self.constant_PPC_max = params["constant_PPC_max"]
 
-    def _create_parameters(self):
-        super()._create_parameters()
+    def _create_parameters(self, people, destinations, dist_dict):
+        super()._create_parameters(people, destinations, dist_dict)
         self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
 
     def _create_acyclicgraph_constraints(self):

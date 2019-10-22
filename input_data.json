@@ -1,83 +1,100 @@
 {
-    "people":{
-        "Livai": {
+    "people": [
+        {
+            "name": "A",
             "loc":[-54,1],
             "car": 1,
             "PPC_max": 2,
             "availabilities":[0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]
         },
-        "Luffy": {
-            "loc":[18.9,89.3],
+        {
+            "name": "B",
+            "loc": [18.9,89.3],
             "car": 1,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]
         },
-        "Conrad" : {
-            "loc":[15,0],
+        {
+            "name" : "C",
+            "loc": [15,0],
             "car": 1,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
         },
-        "Saitama" : {
-            "loc":[3,1],
+        {
+            "name" : "D",
+            "loc": [3,1],
             "car": 1,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         },
-        "Reiner Dakir" : {
-            "loc":[23,22],
+        {
+            "name" : "E",
+            "loc": [23,22],
             "car": 1,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         },
-        "Itachi" : {
-            "loc":[-43,1],
+        {
+            "name" : "F",
+            "loc": [-43,1],
             "car": 1,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0]
         },
-        "Naruto" : {
-            "loc":[45,10],
+        {
+            "name" : "G",
+            "loc": [45,10],
             "car": 1,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
         },
-        "Mikasa Jager" : {
-            "loc":[0,10],
+        {
+            "name": "H",
+            "loc": [0,10],
             "car": 1,
             "PPC_max": 4,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
-           
-    },
-    "destinations":{
-        "Ichiraku": {
-            "loc":[102,9],
+    ],
+    "destinations":[
+        {
+            "name": "1",
+            "loc": [102,9],
             "score": 7.5,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]
         },
-        "Mcdo": {
-            "loc":[1,4],
+        {
+            "name": "2",
+            "loc": [1,4],
             "score": 8,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
         },
-        "Chez Dede": {
-            "loc":[14,59],
+        {
+            "name": "3",
+            "loc": [14,59],
             "score": 10,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         },
-        "Crusty" : {
-            "loc":[-25,-3],
+        {
+            "name" : "4",
+            "loc": [-25,-3],
             "score": 7.5,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        }    
+        }
+    ],
+    "optimizer":{
+        "name": "case2optimizer",
+        "solver_manager": "local",
+        "solver": "gurobi",
+        "alpha": 0.5,
+        "d_max": 1000,
+        "d_min": 0,
+        "constant_PPC_max": 10
+
     },
-    "constant_PPC_max": 10,
-    "activity": "Eat",
-    "alpha": 0.5,
-    "d_max": 1000,
-    "d_min": 0,
-    "solver_manager": "local",
-    "solver": "gurobi",
-    "API_KEY": "None"
+    "activity":{
+        "name" : "Eat",
+        "duration": 1
+    }
 }
