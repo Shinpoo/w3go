@@ -93,7 +93,7 @@ class Optimizer(object):
 
     def _create_parameters(self, people, destinations, dist_dict):
         self.model.d = Param(self.model.N, self.model.N, initialize=dist_dict, doc='Distances')
-        self.model.a_max = Param(self.model.P, initialize={p.name:p.car for p in people}, doc='Can use a car')
+        self.model.a_max = Param(self.model.P, initialize={p.name:int(p.car) for p in people}, doc='Can use a car')
         self.model.score = Param(self.model.D, initialize={d.name:d.score for d in destinations}, doc='Destination scores')
         self.model.alpha = Param(initialize=self.alpha, doc='Importance of distance score compared to the fun score')
         self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
@@ -306,7 +306,7 @@ class Optimizer(object):
                             B_0 = entity.loc[0]
                             B_1 = entity.loc[1]
                             break
-                    plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, head_width=0.1, head_length=0.2, fc='k', ec='k')
+                    plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, width=0.5, fc='k', ec='k')
         plt.legend()
         results_folder = "results/results__%s" % (datetime.now().strftime('%Y-%m-%d_%H%M%S'))
         os.makedirs(results_folder)

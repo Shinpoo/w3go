@@ -17,7 +17,7 @@
         {
             "name" : "C",
             "loc": [15,0],
-            "car": 1,
+            "car": false,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
         },
@@ -84,13 +84,13 @@
         }
     ],
     "optimizer":{
-        "name": "case2optimizer",
+        "name": "case1optimizer",
         "solver_manager": "local",
         "solver": "gurobi",
         "alpha": 0.5,
         "d_max": 1000,
         "d_min": 0,
-        "constant_PPC_max": 10
+        "constant_PPC_max": 2
 
     },
     "activity":{
