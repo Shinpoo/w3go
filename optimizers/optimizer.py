@@ -267,10 +267,12 @@ class Optimizer(object):
             self.results = solver_manager.solve(self.model, opt=self.solver)
         self.solving_duration = time.time() - t0_solve
 
+        
     def show_results(self, people, destinations):
-        if self.results.solver.termination_condition != TerminationCondition.infeasible:
-            self.model.x.display()
-            self.model.u.display()
+        print("Status = %s" % self.results.solver.termination_condition)
+        if self.results.solver.termination_condition == TerminationCondition.feasible or self.results.solver.termination_condition == TerminationCondition.optimal:
+            # self.model.x.display()
+            # self.model.u.display()
             # if self.case == "variable_PPC":
             #     self.model.PPC.display()
             print("Building duration = %gs"% self.building_duration)
@@ -280,7 +282,7 @@ class Optimizer(object):
             print("Distance score = %f" % value(self.model.d_score))
             print("Final score = %f" % value(self.model.objective))
             self._plot_results(people, destinations)
-        print("Status = %s" % self.results.solver.termination_condition)
+        
 
 
     def _plot_results(self, people, destinations):

@@ -3,14 +3,14 @@
         {
             "name": "A",
             "loc":[-54,1],
-            "car": 1,
+            "car": true,
             "PPC_max": 2,
             "availabilities":[0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0]
         },
         {
             "name": "B",
             "loc": [18.9,89.3],
-            "car": 1,
+            "car": true,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]
         },
@@ -24,35 +24,35 @@
         {
             "name" : "D",
             "loc": [3,1],
-            "car": 1,
+            "car": true,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         },
         {
             "name" : "E",
             "loc": [23,22],
-            "car": 1,
+            "car": true,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         },
         {
             "name" : "F",
             "loc": [-43,1],
-            "car": 1,
+            "car": true,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0]
         },
         {
             "name" : "G",
             "loc": [45,10],
-            "car": 1,
+            "car": true,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
         },
         {
             "name": "H",
             "loc": [0,10],
-            "car": 1,
+            "car": true,
             "PPC_max": 4,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
@@ -90,7 +90,7 @@
         "alpha": 0.5,
         "d_max": 1000,
         "d_min": 0,
-        "constant_PPC_max": 2
+        "constant_PPC_max": 1
 
     },
     "activity":{
