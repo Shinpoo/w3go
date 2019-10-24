@@ -21,6 +21,9 @@ class Activity:
 
         return {(i.name,j.name): distance(i.loc, j.loc) for i in self.people + self.destinations for j in self.people + self.destinations}
 
+    def compute_interval_score(self):
+        
+
     def run(self):
         self.optimizer._create_model(self.people, self.destinations, self.compute_distance_dict())
         self.optimizer.solve_model()
