@@ -3,5 +3,8 @@ class Destination:
         for key in params:
             setattr(self, key, params[key])
         self.interval_score = 10
-    def decrease_score(self):
-        pass
+        self.intersection_list = []
+        self.flag_interval = False
+        if not any(self.availabilities):
+            self.flag_interval = True
+            self.interval_score = 0
