@@ -7,8 +7,8 @@ class Case1optimizer(Optimizer):
         super().__init__(params)
         self.constant_PPC_max = params["constant_PPC_max"]
 
-    def _create_parameters(self, people, destinations, dist_dict):
-        super()._create_parameters(people, destinations, dist_dict)
+    def _create_parameters(self, people, destinations, dist_dict, d_mean):
+        super()._create_parameters(people, destinations, dist_dict, d_mean)
         self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
 
     def _create_acyclicgraph_constraints(self):

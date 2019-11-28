@@ -76,11 +76,11 @@ class Optimizer(object):
     # def increase_people_avail(self):
     #     pass
 
-    def _create_model(self, people, destinations, dist_dict):
+    def _create_model(self, people, destinations, dist_dict, d_mean):
         t0_building = time.time()
         self.model = ConcreteModel()
         self._create_sets(people, destinations)
-        self._create_parameters(people, destinations, dist_dict)
+        self._create_parameters(people, destinations, dist_dict, d_mean)
         self._create_variables()
         self._create_constraints()
         self._create_objective()
@@ -91,10 +91,12 @@ class Optimizer(object):
         self.model.P = Set(initialize=[p.name for p in people], doc='People')
         self.model.N = self.model.D | self.model.P # union
 
-    def _create_parameters(self, people, destinations, dist_dict):
+    def _create_parameters(self, people, destinations, dist_dict, d_mean):
         self.model.d = Param(self.model.N, self.model.N, initialize=dist_dict, doc='Distances')
         self.model.a_max = Param(self.model.P, initialize={p.name:int(p.car) for p in people}, doc='Can use a car')
         self.model.score = Param(self.model.D, initialize={d.name:d.score for d in destinations}, doc='Destination scores')
+        self.model.interval_scores = Param(self.model.D, initialize={d.name:d.interval_score for d in destinations}, doc='Destination interval scores') 
+        self.model.d_mean = Param(initialize=d_mean, doc='average total distance')
         self.model.alpha = Param(initialize=self.alpha, doc='Importance of distance score compared to the fun score')
         self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
         self.model.d_min = Param(initialize=self.d_min, doc='The distance that gives a 10/10 distance score')
@@ -114,6 +116,7 @@ class Optimizer(object):
         self.model.z1 = Var(self.model.P, self.model.D, within=Binary, doc="Aux variable - [Sum(i in P)] x_j*a_i (for linearization)")
         self.model.z2 = Var(self.model.P, self.model.D, within=Binary, doc="Aux variable - [Sum(i in P)] a_i*b_ij (for linearization)")
         self.model.fun_score = Var(doc="fun score", within=NonNegativeReals)
+        self.model.interval_score = Var(doc="interval score", within=NonNegativeReals)
         self.model.d_tot = Var(doc="total distance", within=NonNegativeReals)
         self.model.d_score = Var(doc="distance score", within=NonNegativeReals)
         self.model.total_score = Var(doc="final score", within=NonNegativeReals)
@@ -247,9 +250,11 @@ class Optimizer(object):
 
     def _create_score_constraints(self):
         self.model.C21 = Constraint(expr = sum(self.model.x[i] * self.model.score[i] for i in self.model.D) == self.model.fun_score, doc='Fun level')
+        self.model.C25 = Constraint(expr = sum(self.model.x[i] * self.model.interval_scores[i] for i in self.model.D) == self.model.interval_score, doc='interval score')
         self.model.C22 = Constraint(expr = self.model.d_tot == sum(self.model.d[i,j]*self.model.b[i,j] for i in self.model.N for j in self.model.N), doc="total distance")
         self.model.C23 = Constraint(expr = self.model.d_score == 10 * (self.model.d_tot - self.model.d_max) / (self.model.d_min - self.model.d_max), doc="distance score")
-        self.model.C24 = Constraint(expr = self.model.total_score == self.model.alpha * self.model.d_score + (1 - self.model.alpha) * self.model.fun_score, doc="distance score")
+        # self.model.C23 = Constraint(expr = self.model.d_score == (9 - 10)*self.model.d_tot/self.model.d_mean + 10, doc="distance score")
+        self.model.C24 = Constraint(expr = self.model.total_score == self.model.alpha * self.model.d_score + (1 - self.model.alpha) * (self.model.fun_score + self.model.interval_score)/2, doc="total score")
 
     def _create_objective(self):
         def objective_rule(model):
@@ -279,6 +284,8 @@ class Optimizer(object):
             print("Solving duration = %gs"% self.solving_duration)
             print("Total distance = %f" % value(self.model.d_tot))
             print("Fun score = %f" % value(self.model.fun_score))
+            print("Interval score = %f" % value(self.model.interval_score))
+            print("total avg dist = %f" % value(self.model.d_mean))
             print("Distance score = %f" % value(self.model.d_score))
             print("Final score = %f" % value(self.model.objective))
             self._plot_results(people, destinations)

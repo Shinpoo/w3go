@@ -23,19 +23,20 @@ class Activity:
 
     def compute_interval_score(self):
         while not all([d.flag_interval for d in self.destinations]):
-
             for d in self.destinations:
                 if not d.flag_interval:
+                    d.intersection_list = []
                     for hour in range(len(d.availabilities)):
                         product = d.availabilities[hour]
                         for p in self.people:
                             product *= p.increased_availabilities[hour]
                         d.intersection_list.append(product)
+                print(d.intersection_list)
 
             for d in self.destinations:
                 if not d.flag_interval:
                     grouped_list = [(k, sum(1 for i in g)) for k,g in groupby(d.intersection_list)]
-                    print(d.intersection_list)
+                    # print(d.intersection_list)
                     for elem in grouped_list:
                         if elem[0] == 1 and elem[1] >= self.duration:
                             d.flag_interval = True
@@ -46,19 +47,20 @@ class Activity:
             for p in self.people:
                 p.increase_availabilities()
             #print(self.people[0].increased_availabilities)
-            for d in self.destinations:
-                print(d.name + " : " + str(d.interval_score))
+            # for d in self.destinations:
+            #     print(d.name + " : " + str(d.interval_score))
 
 
                 
             
     def run(self):
-        self.optimizer._create_model(self.people, self.destinations, self.compute_distance_dict())
+        self.compute_interval_score()
+        d_mean = len(self.people) * self.compute_average_distance()
+        self.optimizer._create_model(self.people, self.destinations, self.compute_distance_dict(), d_mean)
         self.optimizer.solve_model()
         self.optimizer.show_results(self.people, self.destinations)
 
     
-    def compute_total_average_distance(self):
-        d_mean = np.mean([self.distance(i.loc, j.loc) for i in self.people for j in self.destinations])
-        print(d_mean)
+    def compute_average_distance(self):
+        return np.mean([self.distance(i.loc, j.loc) for i in self.people for j in self.destinations])
 

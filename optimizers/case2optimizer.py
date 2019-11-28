@@ -7,8 +7,8 @@ class Case2optimizer(Optimizer):
         super().__init__(params)
         self.u_level_range = 20 # TODO Define it according to the number of ppl/dest
 
-    def _create_parameters(self, people, destinations, dist_dict):
-        super()._create_parameters(people, destinations, dist_dict)
+    def _create_parameters(self, people, destinations, dist_dict, d_mean):
+        super()._create_parameters(people, destinations, dist_dict, d_mean)
         self.u_level = {name:(i+1) * self.u_level_range for (i,name) in enumerate([p.name for p in people])}
         self.PPC_max = {p.name:p.PPC_max for p in people}
         self.model.PPC_max = Param(self.model.P, initialize=self.PPC_max, doc='Max people in car')
