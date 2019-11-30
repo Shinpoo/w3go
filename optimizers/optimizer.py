@@ -8,7 +8,6 @@ import os
 import time
 
 from pyomo.opt import TerminationCondition
-from datetimerange import DateTimeRange
 from dateutil.parser import isoparse
 from itertools import product
 
@@ -281,9 +280,9 @@ class Optimizer(object):
             print("Building duration = %gs"% self.building_duration)
             print("Solving duration = %gs"% self.solving_duration)
             print("Total distance = %f" % value(self.model.d_tot))
+            print("total avg dist = %f" % value(self.model.d_mean))
             print("Fun score = %f" % value(self.model.fun_score))
             print("Interval score = %f" % value(self.model.interval_score))
-            print("total avg dist = %f" % value(self.model.d_mean))
             print("Distance score = %f" % value(self.model.d_score))
             print("Final score = %f" % value(self.model.objective))
             self._plot_results(people, destinations)

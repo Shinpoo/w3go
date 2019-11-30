@@ -20,41 +20,6 @@
             "car": false,
             "PPC_max": 3,
             "availabilities":[0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
-        },
-        {
-            "name" : "D",
-            "loc": [3,1],
-            "car": true,
-            "PPC_max": 3,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        },
-        {
-            "name" : "E",
-            "loc": [23,22],
-            "car": true,
-            "PPC_max": 3,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        },
-        {
-            "name" : "F",
-            "loc": [-43,1],
-            "car": true,
-            "PPC_max": 3,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0]
-        },
-        {
-            "name" : "G",
-            "loc": [45,10],
-            "car": true,
-            "PPC_max": 3,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
-        },
-        {
-            "name": "H",
-            "loc": [0,10],
-            "car": true,
-            "PPC_max": 4,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
     ],
     "destinations":[
@@ -69,25 +34,13 @@
             "loc": [1,4],
             "score": 8,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
-        },
-        {
-            "name": "3",
-            "loc": [14,59],
-            "score": 10,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        },
-        {
-            "name" : "4",
-            "loc": [-25,-3],
-            "score": 7.5,
-            "availabilities":[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
     ],
     "optimizer":{
         "name": "case2optimizer",
-        "solver_manager": "local",
-        "solver": "gurobi",
-        "alpha": 0.5,
+        "solver_manager": "neos",
+        "solver": "cplex",
+        "alpha": 0.50,
         "constant_PPC_max": 1
 
     },
