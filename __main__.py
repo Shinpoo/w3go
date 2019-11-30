@@ -8,5 +8,4 @@ if __name__ == "__main__":
         data = json.loads(json_file.read())
     act = Activity(data)
     act.run()
-    # act.compute_interval_score()
 

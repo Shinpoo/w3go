@@ -84,12 +84,10 @@
         }
     ],
     "optimizer":{
-        "name": "case1optimizer",
+        "name": "case2optimizer",
         "solver_manager": "local",
         "solver": "gurobi",
         "alpha": 0.5,
-        "d_max": 1000,
-        "d_min": 0,
         "constant_PPC_max": 1
 
     },

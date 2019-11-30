@@ -21,8 +21,6 @@ class Optimizer(object):
         self.solver_manager = None
         self.solver = None
         self.alpha = None
-        self.d_max = None
-        self.d_min = None
         for k in params.keys():
             if k in self.__dict__.keys():
                 self.__setattr__(k, params[k])
@@ -98,8 +96,8 @@ class Optimizer(object):
         self.model.interval_scores = Param(self.model.D, initialize={d.name:d.interval_score for d in destinations}, doc='Destination interval scores') 
         self.model.d_mean = Param(initialize=d_mean, doc='average total distance')
         self.model.alpha = Param(initialize=self.alpha, doc='Importance of distance score compared to the fun score')
-        self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
-        self.model.d_min = Param(initialize=self.d_min, doc='The distance that gives a 10/10 distance score')
+        # self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
+        # self.model.d_min = Param(initialize=self.d_min, doc='The distance that gives a 10/10 distance score')
         self.model.n_people = Param(initialize=len(self.model.P), doc='Number of people')
         # if self.case == "constant_PPC":
         #     self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
@@ -252,8 +250,8 @@ class Optimizer(object):
         self.model.C21 = Constraint(expr = sum(self.model.x[i] * self.model.score[i] for i in self.model.D) == self.model.fun_score, doc='Fun level')
         self.model.C25 = Constraint(expr = sum(self.model.x[i] * self.model.interval_scores[i] for i in self.model.D) == self.model.interval_score, doc='interval score')
         self.model.C22 = Constraint(expr = self.model.d_tot == sum(self.model.d[i,j]*self.model.b[i,j] for i in self.model.N for j in self.model.N), doc="total distance")
-        self.model.C23 = Constraint(expr = self.model.d_score == 10 * (self.model.d_tot - self.model.d_max) / (self.model.d_min - self.model.d_max), doc="distance score")
-        # self.model.C23 = Constraint(expr = self.model.d_score == (9 - 10)*self.model.d_tot/self.model.d_mean + 10, doc="distance score")
+        # self.model.C23 = Constraint(expr = self.model.d_score == 10 * (self.model.d_tot - self.model.d_max) / (self.model.d_min - self.model.d_max), doc="distance score")
+        self.model.C23 = Constraint(expr = self.model.d_score == (9 - 10)*self.model.d_tot/self.model.d_mean + 10, doc="distance score")
         self.model.C24 = Constraint(expr = self.model.total_score == self.model.alpha * self.model.d_score + (1 - self.model.alpha) * (self.model.fun_score + self.model.interval_score)/2, doc="total score")
 
     def _create_objective(self):
@@ -321,4 +319,4 @@ class Optimizer(object):
         os.makedirs(results_folder)
 
         fig1.savefig(results_folder + '/Itinerary.pdf')
-        copyfile("input_data.json", results_folder + "/inputs.json")
+        copyfile("input_data.json", results_folder + "/inputs_out.json")

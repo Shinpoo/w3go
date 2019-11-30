@@ -31,7 +31,7 @@ class Activity:
                         for p in self.people:
                             product *= p.increased_availabilities[hour]
                         d.intersection_list.append(product)
-                print(d.intersection_list)
+                #print(d.intersection_list)
 
             for d in self.destinations:
                 if not d.flag_interval:
@@ -43,10 +43,12 @@ class Activity:
                             break
                     if not d.flag_interval:
                         d.interval_score -= 1
+                        if d.interval_score == 0:
+                            d.flag_interval = True
 
             for p in self.people:
                 p.increase_availabilities()
-            #print(self.people[0].increased_availabilities)
+            # print(self.people[0].increased_availabilities)
             # for d in self.destinations:
             #     print(d.name + " : " + str(d.interval_score))
 
