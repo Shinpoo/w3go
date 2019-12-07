@@ -4,6 +4,11 @@ class Person:
             setattr(self, key, params[key])
         self.increased_availabilities = self.availabilities.copy()
 
+        # TODO
+        self.take_car = None
+        self.in_car = None
+        self.trajectory = None
+
 
     def increase_availabilities(self):
         if not any(self.increased_availabilities):

@@ -285,6 +285,12 @@ class Optimizer(object):
             print("Interval score = %f" % value(self.model.interval_score))
             print("Distance score = %f" % value(self.model.d_score))
             print("Final score = %f" % value(self.model.objective))
+            for i in self.model.D:
+                if self.model.x[i] == 1:
+                    for d in destinations:
+                        if d.name == i:
+                            print(d.activity_start_date)
+            #print(value(self.model.x))
             self._plot_results(people, destinations)
             # for v in self.model.component_objects(Var, active=True):
             #     print("Variable",v)  # doctest: +SKIP

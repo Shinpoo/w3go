@@ -10,3 +10,5 @@ class Destination:
         if not any(self.availabilities):
             self.flag_interval = True
             self.interval_score = 0
+
+        self.chosen_destination = None
