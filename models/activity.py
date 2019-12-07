@@ -4,12 +4,17 @@ import importlib
 from math import sqrt
 from itertools import groupby
 import numpy as np
+from dateutil.parser import isoparse
+from datetime import timedelta
+
+
 class Activity:
     def __init__(self, data):
         self.people = [Person(p_data) for p_data in data["people"]]
         self.destinations = [Destination(d_data) for d_data in data["destinations"]]
         for key in data["activity"]:
             setattr(self, key, data["activity"][key])
+        self.start_date = isoparse(self.start_date)
         module = importlib.import_module("optimizers." + data["optimizer"]["name"])
         class_ = getattr(module, data["optimizer"]["name"].capitalize())
         self.optimizer = class_(data["optimizer"])
@@ -37,10 +42,17 @@ class Activity:
                 if not d.flag_interval:
                     grouped_list = [(k, sum(1 for i in g)) for k,g in groupby(d.intersection_list)]
                     # print(d.intersection_list)
+                    # print(grouped_list)
+                    past_elem = []
                     for elem in grouped_list:
+                        past_elem.append(elem)
                         if elem[0] == 1 and elem[1] >= self.duration:
                             d.flag_interval = True
+                            nb_empty_hours = sum([y for (x,y) in past_elem[:-1]])
+                            d.activity_start_date = self.start_date + timedelta(hours=nb_empty_hours + 1)
+                            d.activity_end_date = d.activity_start_date + timedelta(hours=self.duration)
                             break
+
                     if not d.flag_interval:
                         d.interval_score -= 1
                         if d.interval_score == 0:
@@ -51,6 +63,8 @@ class Activity:
             # print(self.people[0].increased_availabilities)
             # for d in self.destinations:
             #     print(d.name + " : " + str(d.interval_score))
+            #     print(d.activity_start_date)
+            #     print(d.activity_end_date)
 
 
                 

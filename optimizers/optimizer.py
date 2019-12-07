@@ -286,6 +286,10 @@ class Optimizer(object):
             print("Distance score = %f" % value(self.model.d_score))
             print("Final score = %f" % value(self.model.objective))
             self._plot_results(people, destinations)
+            # for v in self.model.component_objects(Var, active=True):
+            #     print("Variable",v)  # doctest: +SKIP
+            #     for index in v:
+            #         print ("   ",index, value(v[index]))  # doctest: +SKIP
         
 
 

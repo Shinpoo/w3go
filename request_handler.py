@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from models.activity import Activity
 import json
@@ -8,12 +8,12 @@ api = Api(app)
 
 class W3go(Resource):
     def get(self):
-        json_file = request.json
+        data = request.json
         #data = json.loads(json_file.read())
-        act = Activity(json_file)
+        act = Activity(data)
         act.run()
         # Return Output data
-        return "Solved"
+        return data
 
 api.add_resource(W3go, '/')
 
