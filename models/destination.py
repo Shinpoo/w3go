@@ -11,4 +11,4 @@ class Destination:
             self.flag_interval = True
             self.interval_score = 0
 
-        self.chosen_destination = None
+        self.chosen_flag = False

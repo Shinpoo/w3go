@@ -1,22 +1,16 @@
 from pyomo.core.kernel import value
 from pyomo.environ import*
 from math import sqrt, ceil
-import matplotlib.pyplot as plt
-from datetime import datetime
-from shutil import copyfile
-import os
 import time
 
 from pyomo.opt import TerminationCondition
-from dateutil.parser import isoparse
-from itertools import product
+
 
 
 
 class Optimizer(object):
     #TODO 1 Remove useless comments (clean up)
-    #TODO 2 Move out plots
-    def __init__(self, params):
+    def __init__(self, params, people, destinations):
         self.solver_manager = None
         self.solver = None
         self.alpha = None
@@ -26,80 +20,36 @@ class Optimizer(object):
         self.model = None
         self.Big_M = 200 # TODO may be better to put different values for each Big_M such that big M is the minimum upper bound
         self.TOL_IS_ZERO = 1e-4 # Move out tolerance from here 
-        
+        self.people = people
+        self.destinations = destinations
 
-
-    # def _pre_process_data(self, data):
-
-    #     def distance(A, B):
-    #         # Calculate the distance from A to B
-    #         # This will be changed when using maps
-    #         return sqrt((A[0]-B[0])**2 + (A[1]-B[1])**2)
-
-    #     self.solver = data["solver"]
-    #     self.solver_manager = data["solver_manager"]
-    #     self.people_list = list(data["people"].keys())
-    #     self.destination_list = list(data["destinations"].keys())
-    #     self.dist_dict = {(i,k): distance(j["loc"], l["loc"]) for i,j in {**data["people"], **data["destinations"]}.items() for k,l in {**data["people"], **data["destinations"]}.items()}
-    #     self.alpha = data["alpha"]
-    #     self.d_max = data["d_max"] * len(data["people"])
-    #     self.d_min = data["d_min"] * len(data["people"])
-    #     self.car_available = {i:j["car"] for (i,j) in data["people"].items()}
-    #     self.PPC_max = {i:j["PPC_max"] for (i,j) in data["people"].items()}
-    #     self.people_avail = {i:j["availabilities"] for (i,j) in data["people"].items()}
-    #     self.dest_avail = {i:j["availabilities"] for (i,j) in data["destinations"].items()}
-    #     self.constant_PPC_max = data["constant_PPC_max"] 
-    #     self.score = {i:j["score"] for (i,j) in data["destinations"].items()}
-    #     self.u_level = {j:(i+1) * self.u_level_range for (i,j) in enumerate(data["people"].keys())}
-    #     self._compute_interval_score()
-
-    # def _compute_interval_score(self):
-    #     # TODO passage en POO au lieu de dict
-    #     self.dest_inter = {}
-    #     self.dest_score_inter = {i:10 for i in self.destination_list}
-    #     for destination in self.destination_list:
-    #         self.dest_inter[destination] = []
-    #         for i in range(len(self.dest_avail[destination])):
-    #             product = self.dest_avail[destination][i]
-    #             for person in self.people_list:
-    #                 product *= self.people_avail[person][i]
-    #             self.dest_inter[destination].append(product)
-    #     print(self.dest_inter.items())
-    #     for (k,v) in self.dest_inter.items():
-    #         if not any(v):
-    #             self.dest_score_inter[k] -= 1
-    #             self.increase_people_avail()
-
-    # def increase_people_avail(self):
-    #     pass
-
-    def _create_model(self, people, destinations, dist_dict, d_mean):
+    def _create_model(self, dist_dict, d_mean):
         t0_building = time.time()
         self.model = ConcreteModel()
-        self._create_sets(people, destinations)
-        self._create_parameters(people, destinations, dist_dict, d_mean)
+        self._create_sets()
+        self._create_parameters(dist_dict, d_mean)
         self._create_variables()
         self._create_constraints()
         self._create_objective()
         self.building_duration = time.time() - t0_building
 
-    def _create_sets(self, people, destinations):
-        self.model.D = Set(initialize=[d.name for d in destinations], doc='Destinations')
-        self.model.P = Set(initialize=[p.name for p in people], doc='People')
+    def _create_sets(self):
+        self.model.D = Set(initialize=[d.name for d in self.destinations], doc='Destinations')
+        self.model.P = Set(initialize=[p.name for p in self.people], doc='People')
         self.model.N = self.model.D | self.model.P # union
 
-    def _create_parameters(self, people, destinations, dist_dict, d_mean):
+    def _create_parameters(self, dist_dict, d_mean):
         self.model.d = Param(self.model.N, self.model.N, initialize=dist_dict, doc='Distances')
-        self.model.a_max = Param(self.model.P, initialize={p.name:int(p.car) for p in people}, doc='Can use a car')
-        self.model.score = Param(self.model.D, initialize={d.name:d.score for d in destinations}, doc='Destination scores')
-        self.model.interval_scores = Param(self.model.D, initialize={d.name:d.interval_score for d in destinations}, doc='Destination interval scores') 
+        self.model.a_max = Param(self.model.P, initialize={p.name:int(p.car) for p in self.people}, doc='Can use a car')
+        self.model.score = Param(self.model.D, initialize={d.name:d.score for d in self.destinations}, doc='Destination scores')
+        self.model.interval_scores = Param(self.model.D, initialize={d.name:d.interval_score for d in self.destinations}, doc='Destination interval scores') 
         self.model.d_mean = Param(initialize=d_mean, doc='average total distance')
         self.model.alpha = Param(initialize=self.alpha, doc='Importance of distance score compared to the fun score')
         # self.model.d_max = Param(initialize=self.d_max, doc='The distance that gives a 0/10 distance score')
         # self.model.d_min = Param(initialize=self.d_min, doc='The distance that gives a 10/10 distance score')
         self.model.n_people = Param(initialize=len(self.model.P), doc='Number of people')
         # if self.case == "constant_PPC":
-        #     self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
+        #     self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people "<"')
         # elif self.case == "variable_PPC":
         #     self.model.PPC_max = Param(self.model.P, initialize=self.PPC_max, doc='Max people in car')
         #     self.model.u_max = Param(self.model.P, initialize=self.u_level, doc='u level')
@@ -269,63 +219,42 @@ class Optimizer(object):
             self.results = solver_manager.solve(self.model, opt=self.solver)
         self.solving_duration = time.time() - t0_solve
 
-        
-    def show_results(self, people, destinations):
-        print("Status = %s" % self.results.solver.termination_condition)
-        if self.results.solver.termination_condition == TerminationCondition.feasible or self.results.solver.termination_condition == TerminationCondition.optimal:
-            # self.model.x.display()
-            # self.model.u.display()
-            # if self.case == "variable_PPC":
-            #     self.model.PPC.display()
-            print("Building duration = %gs"% self.building_duration)
-            print("Solving duration = %gs"% self.solving_duration)
-            print("Total distance = %f" % value(self.model.d_tot))
-            print("total avg dist = %f" % value(self.model.d_mean))
-            print("Fun score = %f" % value(self.model.fun_score))
-            print("Interval score = %f" % value(self.model.interval_score))
-            print("Distance score = %f" % value(self.model.d_score))
-            print("Final score = %f" % value(self.model.objective))
-            for i in self.model.D:
-                if self.model.x[i] == 1:
-                    for d in destinations:
-                        if d.name == i:
-                            print(d.activity_start_date)
-            #print(value(self.model.x))
-            self._plot_results(people, destinations)
-            # for v in self.model.component_objects(Var, active=True):
-            #     print("Variable",v)  # doctest: +SKIP
-            #     for index in v:
-            #         print ("   ",index, value(v[index]))  # doctest: +SKIP
-        
-
-
-    def _plot_results(self, people, destinations):
-        fig1 = plt.figure(figsize=(12, 6.75), dpi=120)
-        plt.axis('equal')
-        #plt.grid()
-
-        for p in people: 
-            plt.plot(p.loc[0],p.loc[1], 'o', label=p.name)
-        for d in destinations: 
-            plt.plot(d.loc[0],d.loc[1], 'x', label=d.name)
-    
-        for i in self.model.N:
+    def update_objects(self):
+        for i in self.model.P:
+            person = self.get_object_from_name(i)
+            #going to
             for j in self.model.N:
-                if 1 - self.TOL_IS_ZERO <= value(self.model.b[i,j]) <= 1 + self.TOL_IS_ZERO :
-                    for entity in people + destinations:
-                        if entity.name == i:
-                            A_0 = entity.loc[0]
-                            A_1 = entity.loc[1]
-                            break
-                    for entity in people + destinations:
-                        if entity.name == j:
-                            B_0 = entity.loc[0]
-                            B_1 = entity.loc[1]
-                            break
-                    plt.arrow(A_0,A_1,B_0-A_0,B_1-A_1, length_includes_head=True, width=0.5, fc='k', ec='k')
-        plt.legend()
-        results_folder = "results/results__%s" % (datetime.now().strftime('%Y-%m-%d_%H%M%S'))
-        os.makedirs(results_folder)
+                if self.model.b[person.name,j] == 1:
+                   person.going_to = self.get_object_from_name(j)
+            #use car
+            if self.model.a[i] == 1:
+                person.use_car = True
 
-        fig1.savefig(results_folder + '/Itinerary.pdf')
-        copyfile("input_data.json", results_folder + "/inputs_out.json")
+        for i in self.model.D:
+            destination = self.get_object_from_name(i)
+            #chosen_destination
+            if self.model.x[i] == 1:
+                destination.chosen_flag = True
+    
+    def get_optimized_results(self):
+        return value(self.model.d_tot), value(self.model.fun_score), value(self.model.interval_score), value(self.model.d_score), value(self.model.objective)
+
+    def get_status(self):
+        return self.results.solver.termination_condition
+
+    def is_optimal(self):
+        if self.get_status() == TerminationCondition.optimal:
+            return True
+        else:
+            return False
+
+    def is_feasible(self):
+        if self.get_status() == TerminationCondition.feasible:
+            return True
+        else:
+            return False
+
+    def get_object_from_name(self, name):
+        for entity in self.people + self.destinations:
+            if name == entity.name:
+                return entity

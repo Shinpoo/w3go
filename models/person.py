@@ -5,9 +5,9 @@ class Person:
         self.increased_availabilities = self.availabilities.copy()
 
         # TODO
-        self.take_car = None
-        self.in_car = None
+        self.use_car = False
         self.trajectory = None
+        self.going_to = None
 
 
     def increase_availabilities(self):

@@ -37,11 +37,11 @@
         }
     ],
     "optimizer":{
-        "name": "case2optimizer",
-        "solver_manager": "neos",
-        "solver": "cplex",
+        "name": "case1optimizer",
+        "solver_manager": "local",
+        "solver": "gurobi",
         "alpha": 0.50,
-        "constant_PPC_max": 1
+        "constant_PPC_max": 2
 
     },
     "activity":{

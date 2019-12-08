@@ -3,12 +3,12 @@ from pyomo.environ import*
 
 
 class Case1optimizer(Optimizer):
-    def __init__(self, params):
-        super().__init__(params)
+    def __init__(self, params, people, destinations):
+        super().__init__(params, people, destinations)
         self.constant_PPC_max = params["constant_PPC_max"]
 
-    def _create_parameters(self, people, destinations, dist_dict, d_mean):
-        super()._create_parameters(people, destinations, dist_dict, d_mean)
+    def _create_parameters(self, dist_dict, d_mean):
+        super()._create_parameters(dist_dict, d_mean)
         self.model.PPC_max = Param(initialize=self.constant_PPC_max, doc='Max people in car')
 
     def _create_acyclicgraph_constraints(self):
