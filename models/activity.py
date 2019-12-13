@@ -77,9 +77,15 @@ class Activity:
             #     print(d.activity_end_date)
 
     def run(self):
+        print("[INFO]: Calculating interval scores...")
         self.compute_interval_score()
+        print("[INFO]: Done.")
+        print("[INFO]: Creating mathematical optimization problem...")
         self.optimizer._create_model(self.compute_distance_dict(), self.d_mean)
+        print("[INFO]: Done.")
+        print("[INFO]: Solving mathematical optimization problem...")
         self.optimizer.solve_model()
+        print("[INFO]: Done.")
         if self.optimizer.is_optimal() or self.optimizer.is_feasible():
             self.optimizer.update_objects()
             self.total_distance, self.assessment_score, self.interval_score, self.distance_score, self.score = self.optimizer.get_optimized_results()
@@ -106,7 +112,7 @@ class Activity:
         fig1 = plt.figure(figsize=(12, 6.75), dpi=120)
         plt.axis('equal')
         #plt.grid()
-        plt.title("Meeting: %s at %s"%(self.chosen_destination.name, self.chosen_destination.activity_start_date))
+        plt.title("Activity: %s - Where: %s - When: %s"%(self.name, self.chosen_destination.name, self.chosen_destination.activity_start_date))
         for p in self.people: 
             plt.plot(p.loc[0],p.loc[1], 'o', label=p.name)
         for d in self.destinations: 
