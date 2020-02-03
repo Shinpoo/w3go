@@ -49,8 +49,8 @@ def make_random_json():
     opt_dict = {
             "name": random.choice(["case1optimizer","case2optimizer"]),
             #"name": "case2optimizer",
-            "solver_manager": "local",
-            "solver": "gurobi",
+            "solver_manager": "neos",
+            "solver": "cplex",
             "alpha": 0.50,
             "constant_PPC_max": 2 + randrange(3)
         }

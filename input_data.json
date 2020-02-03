@@ -38,8 +38,8 @@
     ],
     "optimizer":{
         "name": "case1optimizer",
-        "solver_manager": "local",
-        "solver": "gurobi",
+        "solver_manager": "neos",
+        "solver": "cbc",
         "alpha": 0.50,
         "constant_PPC_max": 2
 
