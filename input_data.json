@@ -32,8 +32,8 @@
     ],
     "optimizer":{
         "name": "case1optimizer",
-        "solver_manager": "local",
-        "solver": "glpk",
+        "solver_manager": "neos",
+        "solver": "cplex",
         "alpha": 0.50,
         "constant_PPC_max": 2
 
