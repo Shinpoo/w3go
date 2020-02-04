@@ -28,18 +28,12 @@
             "loc": [102,9],
             "score": 7.5,
             "availabilities":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]
-        },
-        {
-            "name": "2",
-            "loc": [1,4],
-            "score": 8,
-            "availabilities":[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
         }
     ],
     "optimizer":{
         "name": "case1optimizer",
-        "solver_manager": "neos",
-        "solver": "cbc",
+        "solver_manager": "local",
+        "solver": "glpk",
         "alpha": 0.50,
         "constant_PPC_max": 2
 

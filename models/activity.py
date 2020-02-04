@@ -85,8 +85,8 @@ class Activity:
         print("[INFO]: Done.")
         print("[INFO]: Solving mathematical optimization problem...")
         self.optimizer.solve_model()
-        print("[INFO]: Done.")
         if self.optimizer.is_optimal() or self.optimizer.is_feasible():
+            print("[INFO]: Solved to optimality or feasible.")
             self.optimizer.update_objects()
             self.total_distance, self.assessment_score, self.interval_score, self.distance_score, self.score = self.optimizer.get_optimized_results()
             for d in self.destinations:
@@ -94,6 +94,8 @@ class Activity:
                     self.chosen_destination = d
             self.print_time_score()
             self.plot_activity()
+        else:
+            print("[WARNING] Something went wrong!")
 
 
     def print_time_score(self):
