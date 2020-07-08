@@ -8,17 +8,26 @@ def make_random_json():
     r = RandomWords()
 
     # Return a single random word
-    activities = ["Eat", "Cinema", "Boulet Patins", "Restaurant", "Glace", "Ptit Dej", "Snack", "Work Meeting"]
+    activities = ["Cinema", "Restaurant", "Sport", "Work Meeting"]
     map_size = 100
-    nb_people = 1 + randrange(12)
+    nb_people = 8 + randrange(12)
     nb_dest = 4 + randrange(10)
     planning_range = 1 + randrange(200)
     people_names = [names.get_full_name() for i in range(nb_people)]
-    dest_names = r.get_random_words(limit=nb_dest)
+    dest_names = ["place_"+str(x) for x in range(nb_dest)]
     locs_p = [[random.uniform(-map_size/2, map_size/2), random.uniform(-map_size/2, map_size/2)] for i in range(nb_people)]
     locs_d = [[random.uniform(-map_size/2, map_size/2), random.uniform(-map_size/2, map_size/2)] for i in range(nb_dest)]
+    def dot(K, L):
+        return sum(i[0] * i[1] for i in zip(K, L))
+
     cars = [bool(randrange(2)) for i in range(nb_people)]
     PPC_max = [1 + randrange(4) for i in range(nb_people)]
+    CONST_MAX_PPC = 2 + randrange(3)
+    while dot(cars, PPC_max) < nb_people or sum(cars)*CONST_MAX_PPC < nb_people:
+        print("reload")
+        cars = [bool(randrange(2)) for i in range(nb_people)]
+        PPC_max = [1 + randrange(4) for i in range(nb_people)]
+        CONST_MAX_PPC = 2 + randrange(3)
     availabilities_p = [[randrange(2) for i in range(planning_range)] for j in range(nb_people)]
     availabilities_d = [[randrange(2) for i in range(planning_range)] for j in range(nb_dest)]
 
@@ -49,10 +58,10 @@ def make_random_json():
     opt_dict = {
             "name": random.choice(["case1optimizer","case2optimizer"]),
             #"name": "case2optimizer",
-            "solver_manager": "neos",
-            "solver": "cplex",
+            "solver_manager": "local",
+            "solver": "gurobi",
             "alpha": 0.50,
-            "constant_PPC_max": 2 + randrange(3)
+            "constant_PPC_max": CONST_MAX_PPC
         }
 
     act_dict = {

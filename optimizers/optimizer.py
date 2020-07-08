@@ -213,9 +213,12 @@ class Optimizer(object):
         t0_solve = time.time()
         if self.solver_manager == "local":
             solver=SolverFactory(self.solver)
+            # solver.options['timelimit'] = 20
+            # solver.options["threads"] = 4
             self.results = solver.solve(self.model)
         elif self.solver_manager == "neos":
             solver_manager = SolverManagerFactory('neos')
+            # solver_manager.options['timelimit'] = 20
             self.results = solver_manager.solve(self.model, opt=self.solver)
         self.solving_duration = time.time() - t0_solve
 
