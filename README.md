@@ -23,6 +23,7 @@ This problem can be solved easily with common sense when there are 2, 3 or 4 par
 
 An example of larger scale solution is shown below.
 
+![image](https://user-images.githubusercontent.com/31999833/134488483-95cdab4a-970d-41cf-a408-2b461f60576f.png)
 
 ## Requirements
 Solver requirements, two ways:
