@@ -7,6 +7,6 @@ gurobi\.log
 
 results/
 .vscode/
-webappNOTDONE_ignore
+webappNOTDONE_ignore/
 
 __pycache__/
