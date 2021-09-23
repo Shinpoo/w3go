@@ -1,10 +1,12 @@
 .vscode/settings.json
 .oenv/
+.venv/
 ~$case1.xlsx
-
+saved_data1.json
 gurobi\.log
 
 results/
 .vscode/
+webappNOTDONE_ignore
 
 __pycache__/

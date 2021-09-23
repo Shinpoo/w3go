@@ -633,8 +633,8 @@
     {
       "name": "Kathy Sanders",
       "loc": [
-        45.21872970543855,
-        -47.552367600875556
+        55.21872970543855,
+        -57.552367600875556
       ],
       "car": false,
       "PPC_max": 2,
@@ -948,8 +948,8 @@
     {
       "name": "Thomas Felice",
       "loc": [
-        17.934361768399782,
-        -44.96955348432052
+        27.934361768399782,
+        -54.96955348432052
       ],
       "car": true,
       "PPC_max": 4,
@@ -2722,9 +2722,10 @@
   ],
   "optimizer": {
     "name": "case1optimizer",
-    "solver_manager": "local",
-    "solver": "gurobi",
-    "alpha": 0.5,
+    "solver_manager": "neos",
+    "neos_email":"elselim2@gmail.com",
+    "solver": "cplex",
+    "alpha": 1,
     "constant_PPC_max": 4
   },
   "activity": {
